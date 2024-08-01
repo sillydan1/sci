@@ -1,1 +1,4 @@
 out/
+examples/
+compile_commands.json
+.cache/

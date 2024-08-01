@@ -1,4 +1,4 @@
-# Suckless Continous Integration
+# Suckless/Simple Continous Integration
 Jenkins, Travis, GitHub Actions, GitLab CI. The list goes on.
 This is a minimal tool for fulfilling the CI (Continous Integration) use case.
 
@@ -70,3 +70,12 @@ What language should I implement `scid` in?
  - `java` slow devtime, bloated. No.
  - `rust` slow devtime (not familiar), great tooling, too many risks for a first prototype. No.
  - `shell` quick, easy, instant spaghetti. No.
+
+I choose `c`!
+
+I also choose `Makefile`s! - Just to force myself to use another build system than CMake!
+If you want `compile_commands.json` files, you should use [bear](https://github.com/rizsotto/Bear) as it works well
+
+### Progress
+ - [ ] Zeroth things first, let's create a simple CLI application with `--verbosity VAL` and `--help` options.
+ - [ ] First things first, let's implement something that reacts when some provided file changes.

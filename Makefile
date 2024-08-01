@@ -11,6 +11,8 @@ OBJ = $(SRC:.c=.o)
 OUTDIR := out/
 OBJDIR := out/obj
 BINDIR := out/bin
+CFLAGS += -DSCI_VERSION="\"$(VERSION)\"" -DSCI_NAME="\"$(NAME)\""
+CFLAGS += -Wall -Werror
 
 .PHONY: all clean
 

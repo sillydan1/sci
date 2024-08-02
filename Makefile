@@ -4,15 +4,22 @@
 .POSIX:
 
 NAME=sci
+DESCRIPTION=$(NAME) is a simple contiuous integration system.
 VERSION = 0.1.0
 
-SRC = src/sci.c
-OBJ = $(SRC:.c=.o)
+CC = gcc
 OUTDIR := out/
 OBJDIR := out/obj
 BINDIR := out/bin
-CFLAGS += -DSCI_VERSION="\"$(VERSION)\"" -DSCI_NAME="\"$(NAME)\""
-CFLAGS += -Wall -Werror
+# defs
+CFLAGS += -DSCI_VERSION="\"$(VERSION)\""
+CFLAGS += -DSCI_NAME="\"$(NAME)\""
+CFLAGS += -DSCI_DESCRIPTION="\"$(DESCRIPTION)\""
+# compiler flags
+CFLAGS += -Wall -Werror -std=c23 -g
+# includes
+CFLAGS += -Iinclude
+# libraries
 
 .PHONY: all clean
 
@@ -21,11 +28,14 @@ all: out/bin/sci
 out/obj/%.o: src/%.c | $(OBJDIR)
 	$(CC) -c $? $(CFLAGS) -o $@
 
-out/bin/sci: out/obj/main.o | $(BINDIR)
-	$(CC) -o $@ $(CFLAGS) $+
+OBJ += out/obj/main.o
+OBJ += out/obj/cli.o
+OBJ += out/obj/notify.o
+out/bin/sci: $(OBJ) | $(BINDIR)
+	$(CC) -o $@ $(CFLAGS) $^
 
 clean:
-	rm -rf build
+	rm -rf $(OUTDIR)
 
 $(OUTDIR):
 	mkdir -p $@

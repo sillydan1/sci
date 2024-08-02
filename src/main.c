@@ -1,64 +1,37 @@
-#include <stdio.h>
+#include "cli.h"
+#include "notify.h"
 #include <stdlib.h>
 #include <unistd.h>
-#include <stdbool.h>
-#include <getopt.h>
 
-struct cli_options {
-    int verbosity;
-    bool help;
-    bool version;
-};
-
-struct cli_options new_options() {
-    struct cli_options result;
-    result.verbosity = 0;
-    result.help = false;
-    return result;
-}
-
-//                                                         <max
-char* help_msg = 
-    "Usage: %s [-v level] [-h] [-V]\n"
-    "\n"
-    SCI_NAME " is a simple contiuous integration system.\n"
-    "\n"
-    "OPTIONS:\n"
-    "  -v level    Set verbosity level [0-3]\n"
-    "  -h          Show this message and exit\n"
-    "  -V          Show version and exit\n"
-    ;
-//                                                         <max
-
-void print_help(FILE * out, char* prog_name) {
-    fprintf(out, help_msg, prog_name);
+void on_notify_event(struct inotify_event* const e) {
+    fprintf(stdout, "got an event:\n");
+    fprintf(stdout, "  wd: %d\n", e->wd);
+    fprintf(stdout, "  mask: %d\n", e->mask);
+    fprintf(stdout, "  cookie: %d\n", e->cookie);
+    fprintf(stdout, "  len: %d\n", e->len);
+    fprintf(stdout, "  name: %s\n", e->name);
 }
 
 int main(int argc, char** argv) {
-    struct cli_options options = new_options();
-    int opt;
-    while((opt = getopt(argc, argv, "v:hV")) != -1) {
-        switch(opt) {
-            case 'v':
-                options.verbosity = atoi(optarg);
-                break;
-            case 'V':
-                options.version = true;
-                break;
-            case 'h':
-                options.help = true;
-                break;
-            default: // '?'
-                print_help(stderr, argv[0]);
-                exit(EXIT_FAILURE);
-        }
-    }
-    if(options.help) {
+    struct cli_options args = parse(argc, argv);
+
+    if(args.help) {
         print_help(stdout, argv[0]);
         exit(EXIT_SUCCESS);
     }
-    if(options.version) {
+
+    if(args.version) {
         fprintf(stdout, SCI_VERSION "\n");
         exit(EXIT_SUCCESS);
     }
+
+    if(args.file.has_value) {
+        if(access(args.file.value, F_OK) != 0) {
+            fprintf(stderr, "no such file or directory %s\n", args.file.value);
+            exit(EXIT_FAILURE);
+        }
+        listen_for_changes(args.file.value, &on_notify_event);
+    }
+
+    free_options(args);
 }

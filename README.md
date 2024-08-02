@@ -77,5 +77,20 @@ I also choose `Makefile`s! - Just to force myself to use another build system th
 If you want `compile_commands.json` files, you should use [bear](https://github.com/rizsotto/Bear) as it works well
 
 ### Progress
- - [ ] Zeroth things first, let's create a simple CLI application with `--verbosity VAL` and `--help` options.
- - [ ] First things first, let's implement something that reacts when some provided file changes.
+ - [x] Zeroth things first, let's create a simple CLI application with `--verbosity VAL` and `--help` options.
+ - [x] First things first, let's implement something that reacts when some provided file changes (not poll please).
+ - [ ] Second things second, implement a simple logging system with differing levels of verbosity and configurable 
+       output file using cli options.
+ - [ ] Third things third, implement a thing that simultaneously watches two different files (multithreading).
+ - [ ] Fourth things fourth, implement a prototype that reads a space-separated file and populates a struct.
+
+### Note Regarding `inotify` usage
+From the manpage:
+```
+With careful programming, an application can use inotify to efficiently monitor and cache the state of a set of
+filesystem  objects.  However, robust applications should allow for the fact that bugs in the monitoring logic or races
+of the kind described below may leave the cache inconsistent with the filesystem state.  It is probably wise to do some
+consistency checking, and re‐build the cache when inconsistencies are detected.
+```
+i.e., we should _also_ poll the watched files every once in a while (maybe once per minute? idk) to ensure that we catch
+all events.

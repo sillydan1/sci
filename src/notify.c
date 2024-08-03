@@ -1,5 +1,6 @@
 #include "notify.h"
 #include "util.h"
+#include "log.h"
 
 #define EV_SIZE sizeof(struct inotify_event)
 #define BUF_LEN EV_SIZE * 32
@@ -9,7 +10,7 @@ void listen_for_changes(const char* filename, notify_callback callback) {
     ASSERT_SYSCALL_SUCCESS(fd);
     inotify_add_watch(fd, filename, IN_ATTRIB);
 
-    fprintf(stdout, "listening for changes in file: %s\n", filename);
+    log_info("listening for changes in file: %s", filename);
 
     char buffer[BUF_LEN];
     int r = read(fd, buffer, BUF_LEN);

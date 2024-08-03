@@ -79,9 +79,10 @@ If you want `compile_commands.json` files, you should use [bear](https://github.
 ### Progress
  - [x] Zeroth things first, let's create a simple CLI application with `--verbosity VAL` and `--help` options.
  - [x] First things first, let's implement something that reacts when some provided file changes (not poll please).
- - [ ] Second things second, implement a simple logging system with differing levels of verbosity and configurable 
+ - [x] Second things second, implement a simple logging system with differing levels of verbosity and configurable
        output file using cli options.
  - [ ] Third things third, implement a thing that simultaneously watches two different files (multithreading).
+       it should be cancellable with ctrl+c, but it should just contiuously print event notifications.
  - [ ] Fourth things fourth, implement a prototype that reads a space-separated file and populates a struct.
 
 ### Note Regarding `inotify` usage

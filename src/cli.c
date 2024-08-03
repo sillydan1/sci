@@ -4,24 +4,37 @@
 #include <getopt.h>
 #include "cli.h"
 
-struct cli_options new_options() {
-    struct cli_options result;
+cli_options new_options() {
+    cli_options result;
     result.file.has_value = false;
+    result.file.value = NULL;
+
     result.verbosity = 1;
+
     result.help = false;
+
     result.version = false;
+
+    char *no_color = getenv("NO_COLOR");
+	bool color = true;
+	if(no_color != NULL && no_color[0] != '\0')
+		color = false;
+    result.use_colors = color;
+
+    result.log_file.has_value = false;
+    result.log_file.value = NULL;
     return result;
 }
 
-void free_options(struct cli_options v) {
+void free_options(cli_options v) {
     if(v.file.has_value)
         free(v.file.value);
 }
 
 //                                                         <max
-const char* optstring = "f:v:hV";
+const char* optstring = "f:v:Cl:hV";
 const char* help_msg = 
-    "Usage: %s [-v level] [-h] [-V]\n"
+    "Usage: %s [-v level] [-C] [-l file] [-h] [-V]\n"
     "\n"
     SCI_DESCRIPTION "\n"
     "\n"
@@ -30,7 +43,9 @@ const char* help_msg =
     "\n"
     "OPTIONS:\n"
     "  -f file     set file\n"
-    "  -v level    Set verbosity level [0-3]\n"
+    "  -v level    Set verbosity level [0-4]\n"
+    "  -C          Force color output, ignoring $NO_COLOR\n"
+    "  -l file     Set log to output to a file\n"
     "  -h          Show this message and exit\n"
     "  -V          Show version and exit\n"
     ;
@@ -40,8 +55,8 @@ void print_help(FILE * out, char* prog_name) {
     fprintf(out, help_msg, prog_name);
 }
 
-struct cli_options parse(int argc, char** argv) {
-    struct cli_options options = new_options();
+cli_options parse(int argc, char** argv) {
+    cli_options options = new_options();
     int opt;
     while((opt = getopt(argc, argv, optstring)) != -1) {
         switch(opt) {
@@ -51,6 +66,13 @@ struct cli_options parse(int argc, char** argv) {
                 break;
             case 'v':
                 options.verbosity = atoi(optarg);
+                break;
+            case 'C':
+                options.use_colors = true;
+                break;
+            case 'l':
+                options.log_file.value = strdup(optarg);
+                options.log_file.has_value = true;
                 break;
             case 'V':
                 options.version = true;

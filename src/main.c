@@ -1,19 +1,29 @@
 #include "cli.h"
+#include "log.h"
 #include "notify.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-void on_notify_event(struct inotify_event* const e) {
-    fprintf(stdout, "got an event:\n");
-    fprintf(stdout, "  wd: %d\n", e->wd);
-    fprintf(stdout, "  mask: %d\n", e->mask);
-    fprintf(stdout, "  cookie: %d\n", e->cookie);
-    fprintf(stdout, "  len: %d\n", e->len);
-    fprintf(stdout, "  name: %s\n", e->name);
+void on_event(struct inotify_event* const e) {
+    const char* msg =
+        "got an event:\n"
+        "  wd: %d\n"
+        "  mask: %d\n"
+        "  cookie: %d\n"
+        "  len: %d\n"
+        "  name: %s"
+        ;
+    log_info(msg, e->wd, e->mask, e->cookie, e->len, e->name);
 }
 
 int main(int argc, char** argv) {
-    struct cli_options args = parse(argc, argv);
+    cli_options args = parse(argc, argv);
+    log_settings settings;
+    settings.level = args.verbosity;
+    settings.use_colors = args.use_colors;
+    settings.out_file = args.log_file.has_value ? fopen(args.log_file.value, "w+") : stdout;
+    log_init(settings);
 
     if(args.help) {
         print_help(stdout, argv[0]);
@@ -30,7 +40,7 @@ int main(int argc, char** argv) {
             fprintf(stderr, "no such file or directory %s\n", args.file.value);
             exit(EXIT_FAILURE);
         }
-        listen_for_changes(args.file.value, &on_notify_event);
+        listen_for_changes(args.file.value, &on_event);
     }
 
     free_options(args);

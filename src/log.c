@@ -2,7 +2,9 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <time.h>
+#include <pthread.h>
 
+pthread_mutex_t log_mutex = PTHREAD_MUTEX_INITIALIZER;
 log_settings g_log_settings;
 bool g_log_initialized = false;
 
@@ -64,6 +66,7 @@ void log_log(const char* file, int line, int level, const char* fmt, ...) {
     const char* level_color = get_level_color(level);
     const char* level_name = get_level_name(level);
 
+    pthread_mutex_lock(&log_mutex);
     if(g_log_settings.use_colors)
         fprintf(g_log_settings.out_file, "%s %s%-5s"COLOR_RESET" "COLOR_FILE"%s:%d:"COLOR_RESET" ", timestamp, 
                 level_color, level_name, file, line);
@@ -75,4 +78,5 @@ void log_log(const char* file, int line, int level, const char* fmt, ...) {
     va_end(args);
     fprintf(g_log_settings.out_file, "\n");
     fflush(g_log_settings.out_file);
+    pthread_mutex_unlock(&log_mutex);
 }

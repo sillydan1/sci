@@ -6,16 +6,11 @@
 
 cli_options new_options() {
     cli_options result;
-    result.file.has_value = false;
-    result.file.value = NULL;
-
-    result.file2.has_value = false;
-    result.file2.value = NULL;
-
+    result.config_file.has_value = false;
+    result.config_file.value = NULL;
+    result.executors = 32;
     result.verbosity = 1;
-
     result.help = false;
-
     result.version = false;
 
     char *no_color = getenv("NO_COLOR");
@@ -29,26 +24,23 @@ cli_options new_options() {
     return result;
 }
 
-void free_options(cli_options v) {
-    if(v.file.has_value)
-        free(v.file.value);
-    if(v.file2.has_value)
-        free(v.file2.value);
+void destroy_options(cli_options v) {
+    if(v.config_file.has_value)
+        free(v.config_file.value);
+    if(v.log_file.has_value)
+        free(v.log_file.value);
 }
 
 //                                                         <max
-const char* optstring = "f:F:v:Cl:hV";
+const char* optstring = "f:e:v:Cl:hV";
 const char* help_msg = 
-    "Usage: %s [-v level] [-C] [-l file] [-h] [-V]\n"
+    "Usage: %s [-f file] [-e count] [-v level] [-C] [-l file] [-h] [-V]\n"
     "\n"
     SCI_DESCRIPTION "\n"
     "\n"
-    "THIS PROGRAM IS STILL JUST A PROTOTYPE, AND NOT\n"
-    "ACTUALLY USEFUL YET\n"
-    "\n"
     "OPTIONS:\n"
-    "  -f file     (WIP) set file\n"
-    "  -F file     (WIP) set another file\n"
+    "  -f file     Set sci config file\n"
+    "  -e count    Set the amount of worker threads\n"
     "  -v level    Set verbosity level [0-4]\n"
     "  -C          Force color output, ignoring $NO_COLOR\n"
     "  -l file     Set log to output to a file\n"
@@ -67,15 +59,14 @@ cli_options parse(int argc, char** argv) {
     while((opt = getopt(argc, argv, optstring)) != -1) {
         switch(opt) {
             case 'f':
-                options.file.value = strdup(optarg);
-                options.file.has_value = true;
-                break;
-            case 'F':
-                options.file2.value = strdup(optarg);
-                options.file2.has_value = true;
+                options.config_file.value = strdup(optarg);
+                options.config_file.has_value = true;
                 break;
             case 'v':
                 options.verbosity = atoi(optarg);
+                break;
+            case 'e':
+                options.executors = atoi(optarg);
                 break;
             case 'C':
                 options.use_colors = true;

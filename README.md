@@ -83,7 +83,10 @@ If you want `compile_commands.json` files, you should use [bear](https://github.
        output file using cli options.
  - [x] Third things third, implement a thing that simultaneously watches two different files (multithreading).
        it should be cancellable with ctrl+c, but it should just contiuously print event notifications.
- - [ ] Fourth things fourth, implement a prototype that reads a space-separated file and populates a struct.
+ - [x] Fourth things fourth, implement a prototype that reads a space-separated file and populates a struct.
+ - [ ] Fifth things fifth, implement a prototype that spawns a new thread that executes a shell command.
+ - [ ] Voila! You're there!
+ - [ ] Second iteration! Now Reimplement it and do it better!
 
 ### Note Regarding `inotify` usage
 From the manpage:

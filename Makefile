@@ -15,6 +15,8 @@ BINDIR := out/bin
 CFLAGS += -DSCI_VERSION="\"$(VERSION)\""
 CFLAGS += -DSCI_NAME="\"$(NAME)\""
 CFLAGS += -DSCI_DESCRIPTION="\"$(DESCRIPTION)\""
+CFLAGS += -D_POSIX_C_SOURCE=2
+CFLAGS += -D_GNU_SOURCE
 # compiler flags
 CFLAGS += -Wall -Werror -std=c23 -g
 # includes
@@ -33,6 +35,10 @@ OBJ += out/obj/main.o
 OBJ += out/obj/cli.o
 OBJ += out/obj/log.o
 OBJ += out/obj/notify.o
+OBJ += out/obj/util.o
+OBJ += out/obj/pipeline.o
+OBJ += out/obj/threadlist.o
+OBJ += out/obj/threadpool.o
 out/bin/sci: $(OBJ) | $(BINDIR)
 	$(CC) -o $@ $(CFLAGS) $^
 

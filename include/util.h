@@ -13,5 +13,13 @@
             assert(fd != -1); \
         } \
     } while (0)
+#define ARRAY_SIZE(a) (sizeof((a)) / sizeof((a)[0]))
+
+// remove whitespace characters on both ends of the string.
+// Retuirns a new string that you must free.
+char* trim(const char* const str);
+
+typedef void(*line_handler)(const char*);
+void per_line(const char* file, line_handler handler);
 
 #endif

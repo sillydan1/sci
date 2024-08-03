@@ -4,11 +4,8 @@
 #include "optional.h"
 
 typedef struct {
-    // prototyping
-    optional_str file;
-    optional_str file2;
-
-    // actual
+    optional_str config_file;
+    int executors;
     int verbosity;
     bool help;
     bool version;
@@ -20,7 +17,7 @@ typedef struct {
 cli_options new_options();
 
 // Delete a cli_options struct instance.
-void free_options(cli_options v);
+void destroy_options(cli_options v);
 
 // Print the help message.
 void print_help(FILE * out, char* prog_name);

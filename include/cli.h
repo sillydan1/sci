@@ -4,7 +4,11 @@
 #include "optional.h"
 
 typedef struct {
+    // prototyping
     optional_str file;
+    optional_str file2;
+
+    // actual
     int verbosity;
     bool help;
     bool version;

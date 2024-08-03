@@ -9,6 +9,9 @@ cli_options new_options() {
     result.file.has_value = false;
     result.file.value = NULL;
 
+    result.file2.has_value = false;
+    result.file2.value = NULL;
+
     result.verbosity = 1;
 
     result.help = false;
@@ -29,10 +32,12 @@ cli_options new_options() {
 void free_options(cli_options v) {
     if(v.file.has_value)
         free(v.file.value);
+    if(v.file2.has_value)
+        free(v.file2.value);
 }
 
 //                                                         <max
-const char* optstring = "f:v:Cl:hV";
+const char* optstring = "f:F:v:Cl:hV";
 const char* help_msg = 
     "Usage: %s [-v level] [-C] [-l file] [-h] [-V]\n"
     "\n"
@@ -42,7 +47,8 @@ const char* help_msg =
     "ACTUALLY USEFUL YET\n"
     "\n"
     "OPTIONS:\n"
-    "  -f file     set file\n"
+    "  -f file     (WIP) set file\n"
+    "  -F file     (WIP) set another file\n"
     "  -v level    Set verbosity level [0-4]\n"
     "  -C          Force color output, ignoring $NO_COLOR\n"
     "  -l file     Set log to output to a file\n"
@@ -63,6 +69,10 @@ cli_options parse(int argc, char** argv) {
             case 'f':
                 options.file.value = strdup(optarg);
                 options.file.has_value = true;
+                break;
+            case 'F':
+                options.file2.value = strdup(optarg);
+                options.file2.has_value = true;
                 break;
             case 'v':
                 options.verbosity = atoi(optarg);

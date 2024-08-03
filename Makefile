@@ -20,6 +20,7 @@ CFLAGS += -Wall -Werror -std=c23 -g
 # includes
 CFLAGS += -Iinclude
 # libraries
+CFLAGS += -lpthread
 
 .PHONY: all clean
 

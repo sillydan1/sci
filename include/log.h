@@ -1,9 +1,7 @@
 #ifndef SCI_LOG_H
 #define SCI_LOG_H
-#include <stdarg.h>
 #include <stdio.h>
 
-// TODO: Thread safety!
 enum {
     LOG_TRACE = 4,
     LOG_INFO = 3,

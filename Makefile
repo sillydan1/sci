@@ -2,26 +2,20 @@
 # See LICENSE file for copyright and license details.
 # Note: If you're confused by the makefile, I do emplore you to read the info-page: $ info make
 .POSIX:
-
 NAME=sci
 DESCRIPTION=$(NAME) is a simple contiuous integration system.
 VERSION = 0.1.0
-
 CC = gcc
 OUTDIR := out/
 OBJDIR := out/obj
 BINDIR := out/bin
-# defs
 CFLAGS += -DSCI_VERSION="\"$(VERSION)\""
 CFLAGS += -DSCI_NAME="\"$(NAME)\""
 CFLAGS += -DSCI_DESCRIPTION="\"$(DESCRIPTION)\""
 CFLAGS += -D_POSIX_C_SOURCE=2
 CFLAGS += -D_GNU_SOURCE
-# compiler flags
 CFLAGS += -Wall -Werror -std=c23 -g
-# includes
 CFLAGS += -Iinclude
-# libraries
 CFLAGS += -lpthread
 
 .PHONY: all clean
@@ -71,7 +65,3 @@ $(BINDIR): $(OUTDIR)
 # 	chmod 644 $(DESTDIR)$(MANPREFIX)/man1/st.1
 # 	tic -sx st.info
 # 	@echo Please see the README file regarding the terminfo entry of st.
-#
-# uninstall:
-# 	rm -f $(DESTDIR)$(PREFIX)/bin/st
-# 	rm -f $(DESTDIR)$(MANPREFIX)/man1/st.1

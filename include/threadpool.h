@@ -1,9 +1,8 @@
 #ifndef SCI_THREADPOOL_H
 #define SCI_THREADPOOL_H
-#include <stdbool.h>
-#include <stddef.h>
+#include "optional.h"
 #include <pthread.h>
-// Very inspired by: https://nachtimwald.com/2019/04/12/thread-pool-in-c/
+#include <stdbool.h>
 
 // a work function
 typedef void (*thread_func)(void *arg);
@@ -14,6 +13,7 @@ typedef struct threadpool_work {
     void* arg;
     struct threadpool_work* next;
 } threadpool_work;
+typedef optional_type(threadpool_work*) optional_threadpool_work;
 
 // thread pool object
 typedef struct {

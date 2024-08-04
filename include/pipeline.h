@@ -2,7 +2,6 @@
 #define SCI_PIPELINE_H
 #include "optional.h"
 #include <pthread.h>
-#include <sys/inotify.h>
 
 typedef struct {
     char* name;

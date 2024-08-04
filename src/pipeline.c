@@ -2,7 +2,6 @@
 #include "pipeline.h"
 #include "threadlist.h"
 #include "util.h"
-#include <assert.h>
 #include <regex.h>
 #include <stdlib.h>
 

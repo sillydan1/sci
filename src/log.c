@@ -1,8 +1,7 @@
 #include "log.h"
-#include <stdbool.h>
 #include <assert.h>
-#include <time.h>
 #include <pthread.h>
+#include <stdarg.h>
 
 pthread_mutex_t log_mutex = PTHREAD_MUTEX_INITIALIZER;
 log_settings g_log_settings;

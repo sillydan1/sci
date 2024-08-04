@@ -1,7 +1,7 @@
 #ifndef SCI_CLI_H
 #define SCI_CLI_H
-#include <stdio.h>
 #include "optional.h"
+#include <stdio.h>
 
 typedef struct {
     optional_str config_file;

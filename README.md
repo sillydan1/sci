@@ -84,9 +84,20 @@ If you want `compile_commands.json` files, you should use [bear](https://github.
  - [x] Third things third, implement a thing that simultaneously watches two different files (multithreading).
        it should be cancellable with ctrl+c, but it should just contiuously print event notifications.
  - [x] Fourth things fourth, implement a prototype that reads a space-separated file and populates a struct.
- - [ ] Fifth things fifth, implement a prototype that spawns a new thread that executes a shell command.
- - [ ] Voila! You're there!
- - [ ] Second iteration! Now Reimplement it and do it better!
+ - [x] Fifth things fifth, implement a prototype that spawns a new thread that executes a shell command.
+ - [ ] Sixth things sixth, daemonize it!
+ - [ ] Seventh things seventh, package the sucker (arch, debian, alpine, docker)
+ - [ ] Eight things eight, try it out! - maybe even write the python webhook extension.
+ - [ ] Ninth things ninth, fix bugs, see below
+ - [ ] Tenth things tenth, write manpages
+ - [ ] Eleventh things last, release!
+
+#### Bugs
+ - [ ] command output is being inherited. It should be piped into some random log-file
+ - [ ] pretty sure that `ctrl+c` / SIGINT is not graceful yet.
+ - [ ] missing license
+ - [ ] I am deliberately not using `Restart=on-failure` in the `scid.service` file because we are using `Type=exec`
+       and not `Type=notify` (yet) - which would require a `sd_notify` call of `READY=1` (see `man systemd.service`)
 
 ### Note Regarding `inotify` usage
 From the manpage:

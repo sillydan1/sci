@@ -4,14 +4,8 @@
 #include "pipeline.h"
 #include "threadpool.h"
 #include "util.h"
-#include <bits/pthreadtypes.h>
-#include <pthread.h>
-#include <regex.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <sys/stat.h>
-#include <unistd.h>
 
 void executor(void* data) {
     const char* command = data;
@@ -21,7 +15,8 @@ void executor(void* data) {
 threadpool* pool = NULL;
 
 void on_event(pipeline_event* const e) {
-    threadpool_add_work(pool, executor, (void*)e->command);
+    if(!threadpool_add_work(pool, executor, (void*)e->command))
+        log_error("could not add work to the threadpool");
 }
 
 void* listen_for_changes_thread(void* data) {
@@ -74,7 +69,6 @@ int main(int argc, char** argv) {
     settings.use_colors = args.use_colors;
     settings.out_file = args.log_file.has_value ? fopen(args.log_file.value, "w+") : stdout;
     log_init(settings);
-    pool = threadpool_create(args.executors);
 
     if(args.help) {
         print_help(stdout, argv[0]);
@@ -100,8 +94,14 @@ int main(int argc, char** argv) {
         exit(EXIT_FAILURE);
     }
     
+    pool = threadpool_create(args.executors);
     per_line(args.config_file.value, &config_interpret_line);
 
+    // BOOKMARK: You were reading :Man system.unit and :Man systemd.service as preperation on making a systemd unit file
+    // This will be needed for the .deb package, as well as the arch linux package.
+    // alpine linux is using OpenRC (cool), which complicates things a little bit, but shouldn't be too bad. The wiki is
+    // generally really well written. Otherwise, I am sure that both wiki.gentoo and wiki.archlinux have great pages too
+    // docker is super easy, just make a dockerfile - only concern is the trigger files.
     pipeline_loop();
     threadpool_destroy(pool);
 }

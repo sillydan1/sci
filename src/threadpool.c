@@ -1,15 +1,20 @@
-#include "threadpool.h"
 #include "log.h"
+#include "threadpool.h"
 #include <stdlib.h>
 
-static threadpool_work* threadpool_work_create(thread_func func, void *arg) {
-    threadpool_work* result;
-    if (func == NULL)
-        return NULL;
-    result = malloc(sizeof(threadpool_work));
-    result->func = func;
-    result->arg = arg;
-    result->next = NULL;
+static optional_threadpool_work threadpool_work_create(thread_func func, void *arg) {
+    optional_threadpool_work result;
+    result.value = NULL;
+    result.has_value = false;
+    if(func == NULL) {
+        log_error("cant create threadpool work, function is null");
+        return result;
+    }
+    result.value = malloc(sizeof(threadpool_work));
+    result.value->func = func;
+    result.value->arg = arg;
+    result.value->next = NULL;
+    result.has_value = true;
     return result;
 }
 
@@ -91,7 +96,6 @@ threadpool* threadpool_create(size_t num) {
     }
     return result;
 }
-// TODO: add log statements
 
 void threadpool_destroy(threadpool* pool) {
     log_trace("destroying threadpool");
@@ -122,21 +126,24 @@ void threadpool_destroy(threadpool* pool) {
 
 bool threadpool_add_work(threadpool* pool, thread_func func, void *arg) {
     log_trace("adding work task to pool");
-    threadpool_work* work;
-    if (pool == NULL)
+    if(pool == NULL) {
+        log_error("could not add work to threadpool, pool is null");
         return false;
+    }
 
-    work = threadpool_work_create(func, arg);
-    if (work == NULL)
+    optional_threadpool_work work = threadpool_work_create(func, arg);
+    if(!work.has_value) {
+        log_error("could not add work to threadpool");
         return false;
+    }
 
     pthread_mutex_lock(&(pool->work_mutex));
     if (pool->work_first == NULL) {
-        pool->work_first = work;
+        pool->work_first = work.value;
         pool->work_last = pool->work_first;
     } else {
-        pool->work_last->next = work;
-        pool->work_last = work;
+        pool->work_last->next = work.value;
+        pool->work_last = work.value;
     }
     pthread_cond_broadcast(&(pool->work_cond));
     pthread_mutex_unlock(&(pool->work_mutex));
@@ -145,8 +152,10 @@ bool threadpool_add_work(threadpool* pool, thread_func func, void *arg) {
 }
 
 void threadpool_wait(threadpool* pool) {
-    if (pool == NULL)
+    if(pool == NULL) {
+        log_error("pool object is null");
         return;
+    }
     pthread_mutex_lock(&(pool->work_mutex));
     while (1) {
         if (pool->work_first != NULL || (!pool->stop && pool->working_count != 0) || (pool->stop && pool->thread_count != 0))

@@ -1,0 +1,10 @@
+[Unit]
+Description=Simple Continuous Integration Service
+AssertPathExists=/etc/sci/pipelines.conf
+
+[Service]
+Type=exec
+ExecStart=/usr/local/bin/sci
+
+[Install]
+WantedBy=multi-user.target

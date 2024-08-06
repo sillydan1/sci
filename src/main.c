@@ -6,16 +6,39 @@
 #include "util.h"
 #include <stdlib.h>
 #include <sys/stat.h>
-
-void executor(void* data) {
-    const char* command = data;
-    system(command);
-}
+#include <spawn.h>
+#include <wait.h>
 
 threadpool* pool = NULL;
 
+void executor(void* data) {
+    const pipeline_event* const e = data;
+    pid_t pid;
+    char* name = join("SCI_PIPELINE_NAME=", e->name);
+    char* url = join("SCI_PIPELINE_URL=", e->url);
+    char* trigger = join("SCI_PIPELINE_TRIGGER=", e->trigger);
+    char *envp[] = {
+        name,
+        url,
+        trigger,
+        NULL
+    };
+    char* argv[] = { "/bin/sh", "-c", e->command, NULL };
+    if(posix_spawn(&pid, "/bin/sh", NULL, NULL, argv, envp) != 0) {
+        perror("posix_spawn");
+        return;
+    }
+    int status;
+    waitpid(pid, &status, 0);
+    if(WIFEXITED(status))
+        log_trace("pipeline exited with status %d", WEXITSTATUS(status));
+    free(name);
+    free(url);
+    free(trigger);
+}
+
 void on_event(pipeline_event* const e) {
-    if(!threadpool_add_work(pool, executor, (void*)e->command))
+    if(!threadpool_add_work(pool, executor, (void*)e))
         log_error("could not add work to the threadpool");
 }
 

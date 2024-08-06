@@ -4,7 +4,7 @@ AssertPathExists=/etc/sci/pipelines.conf
 
 [Service]
 Type=exec
-ExecStart=/usr/local/bin/sci
+ExecStart=/usr/local/bin/sci -f /etc/sci/pipelines.conf
 
 [Install]
 WantedBy=multi-user.target

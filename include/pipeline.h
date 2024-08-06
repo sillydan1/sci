@@ -13,7 +13,10 @@ typedef optional_type(pipeline_conf*) optional_pipeline_conf;
 
 typedef struct {
     const struct inotify_event* event;
-    const char* command;
+    char* name;
+    char* url;
+    char* trigger;
+    char* command;
 } pipeline_event;
 
 // create a new pipeline_conf struct instance based on a configuration line.

@@ -22,4 +22,6 @@ char* trim(const char* const str);
 typedef void(*line_handler)(const char*);
 void per_line(const char* file, line_handler handler);
 
+char* join(const char* a, const char* b);
+
 #endif

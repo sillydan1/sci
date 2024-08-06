@@ -24,6 +24,9 @@ void listen_for_changes(const pipeline_conf* config, notify_callback callback) {
         struct inotify_event* e = (struct inotify_event*)&buffer[i];
         pipeline_event ev;
         ev.event = e;
+        ev.name = config->name;
+        ev.url = config->url;
+        ev.trigger = config->trigger;
         ev.command = config->command;
         callback(&ev);
         i += EV_SIZE + e->len;

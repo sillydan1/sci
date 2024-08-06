@@ -36,3 +36,11 @@ void per_line(const char* file, line_handler handler) {
     free(line);
     fclose(stream);
 }
+
+char* join(const char* a, const char* b) {
+    size_t alen = strlen(a);
+    size_t blen = strlen(b);
+    char* result = malloc(alen + blen + 1);
+    sprintf(result, "%s%s", a, b);
+    return result;
+}

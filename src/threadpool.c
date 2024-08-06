@@ -42,7 +42,7 @@ static threadpool_work* threadpool_work_pop(threadpool* pool) {
     return work;
 }
 
-static void* threadpool_worker(void *arg) {
+static void* threadpool_worker(void* arg) {
     log_trace("threadpool worker spawned");
     threadpool* pool = arg;
     threadpool_work* work;

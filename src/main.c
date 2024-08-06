@@ -12,34 +12,38 @@
 #include <wait.h>
 
 threadpool* pool = NULL;
+char* log_dir = "./"; // NOTE: must end with a /
 
 void executor(void* data) {
     const pipeline_event* const e = data;
     pid_t pid;
-    char* name = join("SCI_PIPELINE_NAME=", e->name);
-    char* url = join("SCI_PIPELINE_URL=", e->url);
-    char* trigger = join("SCI_PIPELINE_TRIGGER=", e->trigger);
-    char *envp[] = {
-        name,
-        url,
-        trigger,
-        NULL
-    };
-    char* argv[] = { "/bin/sh", "-c", e->command, NULL };
     uuid_t uuid;
     uuid_generate(uuid);
     char* pipeline_id = malloc(32);
     uuid_unparse_lower(uuid, pipeline_id);
     posix_spawn_file_actions_t actions;
     posix_spawn_file_actions_init(&actions);
-    char* output_file = join(pipeline_id, ".log");
-    int fd = open(output_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    char* log_file = join(pipeline_id, ".log");
+    char* log_filepath = join(log_dir, log_file);
+    int fd = open(log_filepath, O_WRONLY | O_CREAT | O_TRUNC, 0644);
     if (fd == -1) {
         perror("open");
         return;
     }
     posix_spawn_file_actions_adddup2(&actions, fd, STDOUT_FILENO);
     posix_spawn_file_actions_adddup2(&actions, fd, STDERR_FILENO);
+    char* name = join("SCI_PIPELINE_NAME=", e->name);
+    char* url = join("SCI_PIPELINE_URL=", e->url);
+    char* trigger = join("SCI_PIPELINE_TRIGGER=", e->trigger);
+    char* id = join("SCI_PIPELINE_ID=", pipeline_id);
+    char *envp[] = {
+        name,
+        url,
+        trigger,
+        id,
+        NULL
+    };
+    char* argv[] = { "/bin/sh", "-c", e->command, NULL };
     if(posix_spawn(&pid, "/bin/sh", &actions, NULL, argv, envp) != 0) {
         perror("posix_spawn");
         return;
@@ -49,8 +53,10 @@ void executor(void* data) {
     waitpid(pid, &status, 0);
     if(WIFEXITED(status))
         log_trace("{%s} exited with status %d", pipeline_id, WEXITSTATUS(status));
+    // TODO: clean this function up!
     free(pipeline_id);
-    free(output_file);
+    free(log_file);
+    free(log_filepath);
     free(name);
     free(url);
     free(trigger);
@@ -127,7 +133,13 @@ int main(int argc, char** argv) {
         exit(EXIT_FAILURE);
     }
 
+    if(args.pipeline_log_dir.has_value)
+        log_dir = args.pipeline_log_dir.value;
+
     struct stat st = {0};
+    if(stat(log_dir, &st) == -1)
+        mkdir(log_dir, 0700);
+
     if(stat("/tmp/sci", &st) == -1)
         mkdir("/tmp/sci", 0700);
 

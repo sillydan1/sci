@@ -11,6 +11,7 @@ typedef struct {
     bool version;
     bool use_colors;
     optional_str log_file;
+    optional_str pipeline_log_dir;
 } cli_options;
 
 // Construct a new cli_options struct instance.

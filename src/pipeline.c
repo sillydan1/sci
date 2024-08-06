@@ -38,14 +38,11 @@ optional_pipeline_conf pipeline_create(const char* config_line) {
     result.value->url = opts[1];
     result.value->trigger = opts[2];
     result.value->command = opts[3];
-    const char* msg =
-        "config:\n"
-        "name: %s\n"
-        "url: %s\n"
-        "trigger: %s\n"
-        "command: %s"
-        ;
-    log_trace(msg, result.value->name, result.value->url, result.value->trigger, result.value->command);
+    log_trace("read config:");
+    log_trace("  name=%s", result.value->name);
+    log_trace("  url=%s", result.value->url);
+    log_trace("  trigger=%s", result.value->trigger);
+    log_trace("  command=%s", result.value->command);
     result.has_value = true;
     return result;
 }

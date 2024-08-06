@@ -148,7 +148,7 @@ int main(int argc, char** argv) {
     }
 
     if(!args.config_file.has_value) {
-        fprintf(stderr, "no file provided see -h for usage\n");
+        fprintf(stderr, "no pipeline config file provided see -h for usage\n");
         exit(EXIT_FAILURE);
     }
 
@@ -170,11 +170,6 @@ int main(int argc, char** argv) {
     pool = threadpool_create(args.executors);
     per_line(args.config_file.value, &config_interpret_line);
 
-    // BOOKMARK: You were reading :Man system.unit and :Man systemd.service as preperation on making a systemd unit file
-    // This will be needed for the .deb package, as well as the arch linux package.
-    // alpine linux is using OpenRC (cool), which complicates things a little bit, but shouldn't be too bad. The wiki is
-    // generally really well written. Otherwise, I am sure that both wiki.gentoo and wiki.archlinux have great pages too
-    // docker is super easy, just make a dockerfile - only concern is the trigger files.
     pipeline_loop();
     threadpool_destroy(pool);
 }

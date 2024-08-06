@@ -1,6 +1,7 @@
 #ifndef SCI_LOG_H
 #define SCI_LOG_H
 #include <stdio.h>
+#include <stdbool.h>
 
 enum {
     LOG_TRACE = 4,

@@ -72,7 +72,7 @@ void log_log(const char* file, int line, int level, const char* fmt, ...) {
     else
         fprintf(g_log_settings.out_file, "%s %-5s %s:%d: ", timestamp, level_name, file, line);
     va_list args;
-    va_start(args, format);
+    va_start(args, fmt);
     vfprintf(g_log_settings.out_file, fmt, args);
     va_end(args);
     fprintf(g_log_settings.out_file, "\n");

@@ -1,6 +1,68 @@
-# Suckless/Simple Continous Integration
+# Simple CI (Continous Integration)
 Jenkins, Travis, GitHub Actions, GitLab CI. The list goes on.
-This is a minimal tool for fulfilling the CI (Continous Integration) use case.
+There are many CI systems.
+All of them overcomplicate an extremely simple use case:
+"I want to trigger custom scripts (usually just a list of simple shell commands) on a server.
+Either automatically, or manually.
+And then I want to be follow and see any errors that may happen."
+
+There's no need to invent the wheel 10 different times.
+Most of the actions required by the CI use case can be handled with most UNIX tools such as `tail`,
+`cat`, `inotify` etc.
+At the core of CI must be a triggering system that can be dynamically configured to run a pipeline script.
+
+This program provides that simple triggering system where you simply `touch` a file, and the associated
+pipeline will then be executed.
+You can then follow the log via `tail`.
+
+The operation of sci is configured through a pipelines.conf configuration file  (see  sci(7)  for
+configuration  language  details) and each pipeline will have an associated pipeline trigger file
+that can be By default, pipeline triggers are placed in /tmp/sci but this can be overridden  with
+the `-T` flag (WIP feature). For more commandline options see the manpage `sci(1)` or use the `--help` option.
+
+## Dependencies
+Just GNU/Linux! `sci` is just using the POSIX api, so it should work with *NIX, but it has only been tested on GNU/Linux
+systems.
+NOTE: Not tested with `muslc` systems yet, `sci` use some libc GNU extensions, but it would be nice to support alpine
+linux some time in the future.
+
+## Build
+Build the project using `make`:
+```sh
+make
+```
+
+## Install
+Install the project:
+```sh
+make
+sudo make install
+```
+
+By default, `sci` is installed to `/usr/local` but this can be overridden by providing the `PREFIX` var:
+```sh
+make
+sudo make install PREFIX=/some/path
+```
+
+## Package
+`sci` can be packaged for multiple distributions:
+
+### Arch Linux
+It is recommended that you use an arch linux distribution when building.
+<!-- TODO: add a dockerfile for arch building -->
+```sh
+```
+
+### Debian
+It is recommended that you use the `deb-builder.dockerfile` docker image to build the debian image.
+```sh
+```
+
+#### Building the debian builer docker image
+```sh
+docker build -t debbuilder deb-builder.dockerfile .
+```
 
 ## Brainstorm
 If you dont want to congest your CI server. Too bad. Write faster ci suites. (TODO: implement runners)
@@ -75,37 +137,3 @@ I choose `c`!
 
 I also choose `Makefile`s! - Just to force myself to use another build system than CMake!
 If you want `compile_commands.json` files, you should use [bear](https://github.com/rizsotto/Bear) as it works well
-
-### Progress
- - [x] Zeroth things first, let's create a simple CLI application with `--verbosity VAL` and `--help` options.
- - [x] First things first, let's implement something that reacts when some provided file changes (not poll please).
- - [x] Second things second, implement a simple logging system with differing levels of verbosity and configurable
-       output file using cli options.
- - [x] Third things third, implement a thing that simultaneously watches two different files (multithreading).
-       it should be cancellable with ctrl+c, but it should just contiuously print event notifications.
- - [x] Fourth things fourth, implement a prototype that reads a space-separated file and populates a struct.
- - [x] Fifth things fifth, implement a prototype that spawns a new thread that executes a shell command.
- - [ ] Sixth things sixth, daemonize it!
- - [ ] Seventh things seventh, package the sucker (arch, debian, alpine, docker)
- - [ ] Eight things eight, try it out! - maybe even write the python webhook extension.
- - [ ] Ninth things ninth, fix bugs, see below
- - [ ] Tenth things tenth, write manpages
- - [ ] Eleventh things last, release!
-
-#### Bugs
- - [ ] command output is being inherited. It should be piped into some random log-file
- - [ ] pretty sure that `ctrl+c` / SIGINT is not graceful yet.
- - [ ] missing license
- - [ ] I am deliberately not using `Restart=on-failure` in the `scid.service` file because we are using `Type=exec`
-       and not `Type=notify` (yet) - which would require a `sd_notify` call of `READY=1` (see `man systemd.service`)
-
-### Note Regarding `inotify` usage
-From the manpage:
-```
-With careful programming, an application can use inotify to efficiently monitor and cache the state of a set of
-filesystem  objects.  However, robust applications should allow for the fact that bugs in the monitoring logic or races
-of the kind described below may leave the cache inconsistent with the filesystem state.  It is probably wise to do some
-consistency checking, and re‐build the cache when inconsistencies are detected.
-```
-i.e., we should _also_ poll the watched files every once in a while (maybe once per minute? idk) to ensure that we catch
-all events.

@@ -2,3 +2,6 @@ out/
 examples/
 compile_commands.json
 .cache/
+*.tar.gz
+*.log
+*.zst

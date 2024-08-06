@@ -4,9 +4,11 @@
 #include "pipeline.h"
 #include "threadpool.h"
 #include "util.h"
+#include <fcntl.h>
+#include <spawn.h>
 #include <stdlib.h>
 #include <sys/stat.h>
-#include <spawn.h>
+#include <uuid/uuid.h>
 #include <wait.h>
 
 threadpool* pool = NULL;
@@ -24,14 +26,31 @@ void executor(void* data) {
         NULL
     };
     char* argv[] = { "/bin/sh", "-c", e->command, NULL };
-    if(posix_spawn(&pid, "/bin/sh", NULL, NULL, argv, envp) != 0) {
+    uuid_t uuid;
+    uuid_generate(uuid);
+    char* pipeline_id = malloc(32);
+    uuid_unparse_lower(uuid, pipeline_id);
+    posix_spawn_file_actions_t actions;
+    posix_spawn_file_actions_init(&actions);
+    char* output_file = join(pipeline_id, ".log");
+    int fd = open(output_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (fd == -1) {
+        perror("open");
+        return;
+    }
+    posix_spawn_file_actions_adddup2(&actions, fd, STDOUT_FILENO);
+    posix_spawn_file_actions_adddup2(&actions, fd, STDERR_FILENO);
+    if(posix_spawn(&pid, "/bin/sh", &actions, NULL, argv, envp) != 0) {
         perror("posix_spawn");
         return;
     }
+    log_trace("{%s} spawned (%s)", pipeline_id, e->name);
     int status;
     waitpid(pid, &status, 0);
     if(WIFEXITED(status))
-        log_trace("pipeline exited with status %d", WEXITSTATUS(status));
+        log_trace("{%s} exited with status %d", pipeline_id, WEXITSTATUS(status));
+    free(pipeline_id);
+    free(output_file);
     free(name);
     free(url);
     free(trigger);

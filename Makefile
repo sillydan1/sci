@@ -16,7 +16,7 @@ CFLAGS += -D_POSIX_C_SOURCE=2
 CFLAGS += -D_GNU_SOURCE
 CFLAGS += -Wall -Werror -std=c23 -g
 CFLAGS += -Iinclude
-CFLAGS += -lpthread
+CFLAGS += -lpthread -luuid
 
 .PHONY: all clean
 

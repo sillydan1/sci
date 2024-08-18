@@ -1,0 +1,10 @@
+# Example file for upstream/metadata.
+# See https://wiki.debian.org/UpstreamMetadata for more info/fields.
+# Below an example based on a github project.
+
+Bug-Database: https://git.gtz.dk/agj/sci/issues
+Bug-Submit: https://git.gtz.dk/agj/sci/issues/new
+# Changelog: https://git.gtz.dk/agj/sci/blob/master/CHANGES
+# Documentation: https://git.gtz.dk/agj/sci/wiki
+Repository-Browse: https://git.gtz.dk/agj/sci
+Repository: https://git.gtz.dk/agj/sci.git

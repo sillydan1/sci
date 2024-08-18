@@ -1,57 +1,92 @@
-.\"                                      Hey, EMACS: -*- nroff -*-
-.\" (C) Copyright 2024 unknown <asger.gitz@hotmail.com>,
-.\"
-.\" First parameter, NAME, should be all caps
-.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
-.\" other parameters are allowed: see man(7), man(1)
-.TH Sci SECTION "August 18 2024"
-.\" Please adjust this date whenever revising the manpage.
-.\"
-.\" Some roff macros, for reference:
-.\" .nh        disable hyphenation
-.\" .hy        enable hyphenation
-.\" .ad l      left justify
-.\" .ad b      justify to both left and right margins
-.\" .nf        disable filling
-.\" .fi        enable filling
-.\" .br        insert line break
-.\" .sp <n>    insert n+1 empty lines
-.\" for manpage-specific macros, see man(7)
-.SH NAME
-sci \- program to do something
-.SH SYNOPSIS
-.B sci
-.RI [ options ] " files" ...
-.br
-.B bar
-.RI [ options ] " files" ...
-.SH DESCRIPTION
-This manual page documents briefly the
-.B sci
-and
-.B bar
-commands.
-.PP
-.\" TeX users may be more comfortable with the \fB<whatever>\fP and
-.\" \fI<whatever>\fP escape sequences to invode bold face and italics,
-.\" respectively.
-\fBsci\fP is a program that...
-.SH OPTIONS
-These programs follow the usual GNU command line syntax, with long
-options starting with two dashes ('\-').
-A summary of options is included below.
-For a complete description, see the Info files.
+\" cli argument
+.de AR
+.B \\$1
+.I \\$2
+..
+\" cli option
+.de OP
+[
+.B \\$1
+.I \\$2
+\\$3
+]
+..
+.de op
 .TP
-.B \-h, \-\-help
-Show summary of options.
-.TP
-.B \-v, \-\-version
-Show version of program.
-.SH SEE ALSO
-.BR bar (1),
-.BR baz (1).
-.br
-The programs are documented fully by
-.IR "The Rise and Fall of a Fooish Bar" ,
-available via the Info system.
+.BR \\$1 ", " \\$2 " " \fI\\$3
+..
+.TH sci 1 2024-08-17 "VERSION" "Simple CI manual"
 
+.SH
+NAME
+sci - a simple continuous integration system
+
+.SH
+SYNOPSIS
+.B sci
+.AR -f /path/to/pipelines.conf
+.br
+.B sci
+.AR -f /path/to/pipelines.conf
+.AR -v 4
+.AR -L /path/to/logs/
+.br
+.B sci
+.AR -h
+
+.SH
+DESCRIPTION
+This program provides a simple triggering system for your CI (Continuous Integration) server.
+The operation of
+.B sci
+is configured through a
+.I pipelines.conf
+configuration file (see
+.I sci(7)
+for configuration language details)
+and each pipeline will have an associated pipeline trigger file that can be 
+By default, pipeline triggers are placed in /tmp/sci but this can be overridden with the
+.OP -x.
+
+
+
+.SH EXAMPLES
+A simple example configuration file could look something like the following:
+
+"cool-horse" "example.com/cool" "on-cool" "/path/to/pipeline-scripts/cool.sh"
+.br
+"rad-horse" "example.com/rad" "on-rad" "/path/to/pipeline-scripts/rad.sh"
+
+Each line represents a pipeline, and each argument is space-separated.
+This example file creates two pipelines, one called "cool-horse" and another called "rad-horse".
+Also note that arguments can, but are not required to be "-enclosed.
+
+.SH OPTIONS
+.op -f --input path
+(required) add a TTA model path to parse.
+
+.op -m --no-warn
+disable all warnings.
+
+.SH AUTHOR
+Asger Gitz\-Johansen <asger.gitz@hotmail.com>.
+
+\" TODO: decide on license
+.SH COPYRIGHT
+            Copyright (C) 2024  Asger Gitz-Johansen
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+.SH SEE ALSO
+\" TODO: write sci(7)

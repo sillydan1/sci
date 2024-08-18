@@ -41,6 +41,7 @@ docker is super easy, just make a dockerfile - only concern is the trigger files
       or maybe the scripts themselves would upload artifacts?
  - [ ] I am deliberately not using `Restart=on-failure` in the `scid.service` file because we are using `Type=exec`
        and not `Type=notify` (yet) - which would require a `sd_notify` call of `READY=1` (see `man systemd.service`)
+ - [ ] Custom environment variables passed to the pipelines on invokation should be possible.
 
 ### Note Regarding `inotify` usage
 From the manpage:

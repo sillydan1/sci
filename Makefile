@@ -6,7 +6,7 @@
 NAME=sci
 DESCRIPTION=$(NAME) is a simple contiuous integration system.
 VERSION = 1.0.0
-PREFIX = /usr/local
+PREFIX ?= /usr/local
 MANPREFIX = $(PREFIX)/share/man
 
 CC = gcc
@@ -38,7 +38,7 @@ OBJ += out/obj/pipeline.o
 OBJ += out/obj/threadlist.o
 OBJ += out/obj/threadpool.o
 out/bin/sci: $(OBJ) | $(BINDIR)
-	$(CC) -o $@ $(CFLAGS) $^
+	$(CC) -o $@ $^ $(CFLAGS)
 
 clean:
 	rm -rf $(OUTDIR)

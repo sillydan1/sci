@@ -1,10 +1,7 @@
 #!/bin/bash
-archbuilder_image=$(docker images | grep archbuilder)
 set -e
-if [ -z $archbuilder_image ]; then
-    echo "building archbuilder image..."
-    docker build -t archbuilder -f arch-builder.dockerfile .
-fi
+echo "building archbuilder image..."
+docker build -t archbuilder -f arch-builder.dockerfile .
 
 echo "building source dist..."
 make dist

@@ -1,11 +1,8 @@
 #!/bin/bash
 # TODO: SCI_VERSION env var
-debbuilder_image=$(docker images | grep debbuilder)
 set -e
-if [ -z $debbuilder_image ]; then
-    echo "building debbuilder image..."
-    docker build -t debbuilder -f deb-builder.dockerfile .
-fi
+echo "building debbuilder image..."
+docker build -t debbuilder -f deb-builder.dockerfile .
 
 echo "building source dist..."
 make dist

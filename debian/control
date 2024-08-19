@@ -5,15 +5,12 @@ Maintainer: Asger Gitz-Johansen <asger.gitz@hotmail.com>
 Rules-Requires-Root: no
 Build-Depends:
  debhelper-compat (= 13),
- uuid-dev,
- uuid,
 Standards-Version: 4.6.2
 Homepage: https://git.gtz.dk/agj/sci
 
 Package: sci
 Architecture: any
 Depends:
- libuuid,
  ${shlibs:Depends},
  ${misc:Depends},
 Description: simple continuous integration (ci) system

@@ -4,9 +4,9 @@ pkgver=1.0.0
 pkgrel=1
 epoch=
 pkgdesc="A simple / minimal CI (Continuous Integration) system"
-arch=('x86_64')  # TODO: also arm64 when you're not tired
-url="gitea.local:3000/agj/sci"
-license=('GPL-3.0-or-later')  # TODO: add LICENSE file and header
+arch=('x86_64')
+url="https://git.gtz.dk/agj/sci"
+license=('GPL-3.0-or-later')
 groups=()
 depends=("glibc"
     "util-linux-libs")
@@ -22,7 +22,7 @@ install=
 changelog=
 source=("$pkgname-$pkgver.tar.gz")
 noextract=()
-sha256sums=("948092bdcc3591afcdc205263832a06c838aa9d524c762b061e91cffa04b7d63")
+sha256sums=("SRC_SHA256")
 validpgpkeys=()
 
 build() {

@@ -1,7 +1,10 @@
 out/
 examples/
+artifacts/
+pkg/
 compile_commands.json
 .cache/
 *.tar.gz
 *.log
 *.zst
+PKGBUILD

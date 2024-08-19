@@ -11,7 +11,7 @@
  - [ ] Seventh things seventh, package the sucker (arch, debian, alpine, docker)
     - [x] archlinux
          - https://wiki.archlinux.org/title/Creating_packages
-    - [ ] debian
+    - [x] debian
          - see `/home/agj/documents/Projects/packaging/deb-packaging-tutorial.pdf`
          - just use docker.
     - [ ] alpine

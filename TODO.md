@@ -14,8 +14,8 @@
     - [x] debian
          - see `/home/agj/documents/Projects/packaging/deb-packaging-tutorial.pdf`
          - just use docker.
-    - [ ] alpine
-    - [ ] docker
+    - [-] ~~alpine~~ later.
+    - [-] ~~docker~~ later.
  - [ ] Eight things eight, try it out! - maybe even write the python webhook extension.
  - [ ] Ninth things ninth, fix bugs, see below
  - [ ] Tenth things tenth, write manpages, choose license

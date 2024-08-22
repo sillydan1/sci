@@ -73,6 +73,9 @@ Could this also be used as a systest replacement? The value of systest is the dr
 really the controllers themselves. But yes, this system could replace the systest runner scripts. But not the drivers or
 the configuration files themselves...
 
+Why trigger files instead of IPC (Inter Process Communication)?
+It was easier to implement. If you know how to add POSIX IPC (not a fan of System-V IPC), please submit a PR :-)
+
 ### Using
 `/etc/sci/conf.d/pipelines.conf`
 ```txt

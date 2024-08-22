@@ -42,6 +42,8 @@ docker is super easy, just make a dockerfile - only concern is the trigger files
  - [ ] I am deliberately not using `Restart=on-failure` in the `scid.service` file because we are using `Type=exec`
        and not `Type=notify` (yet) - which would require a `sd_notify` call of `READY=1` (see `man systemd.service`)
  - [ ] Custom environment variables passed to the pipelines on invokation should be possible.
+ - [ ] Listener threads should be killed and restarted (worker pool should just chug along) when pipeline config file
+       has changed during runtime. Should be disableable with `--no-hot-reload-config` - i.e. on by default.
 
 ### Note Regarding `inotify` usage
 From the manpage:

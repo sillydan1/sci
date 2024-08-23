@@ -23,24 +23,33 @@
 
 cli_options new_options() {
     cli_options result;
-    result.config_file.has_value = false;
-    result.config_file.value = NULL;
+    char* config_file = getenv("SCI_CONFIG_FILE");
+    result.config_file.has_value = config_file != NULL;
+    result.config_file.value = config_file;
+
     result.executors = 32;
-    result.verbosity = 1;
+    char* verbosity_env = getenv("SCI_VERBOSITY");
+    int verbosity = 1;
+    if(verbosity_env != NULL)
+        verbosity = atoi(verbosity_env);
+    result.verbosity = verbosity;
+
     result.help = false;
     result.version = false;
 
-    char *no_color = getenv("NO_COLOR");
-	bool color = true;
-	if(no_color != NULL && no_color[0] != '\0')
-		color = false;
+    char* no_color = getenv("NO_COLOR");
+    bool color = true;
+    if(no_color != NULL && no_color[0] != '\0')
+        color = false;
     result.use_colors = color;
 
-    result.log_file.has_value = false;
-    result.log_file.value = NULL;
+    char* log_file = getenv("SCI_LOG_file");
+    result.log_file.has_value = log_file != NULL;
+    result.log_file.value = log_file;
 
-    result.pipeline_log_dir.has_value = false;
-    result.pipeline_log_dir.value = NULL;
+    char* pipeline_log_dir = getenv("SCI_PIPELINE_LOG_DIR");
+    result.pipeline_log_dir.has_value = pipeline_log_dir != NULL;
+    result.pipeline_log_dir.value = pipeline_log_dir;
     return result;
 }
 
@@ -71,6 +80,9 @@ const char* help_msg =
     "  -l file     Set sci's log to output to a file\n"
     "  -h          Show this message and exit\n"
     "  -V          Show version and exit\n"
+    "\n"
+    "Most options can also be provided as env variables.\n"
+    "See sci(1) for more details.\n"
     ;
 //                                                         <max
 

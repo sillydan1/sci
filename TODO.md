@@ -23,7 +23,16 @@
  - [ ] Twelveth things last, release!
    - Setup gitea.gtz.dk (will learn you how to set up subdomains (useful for shop.gtz.dk))
 
-BOOKMARK: You were reading :Man system.unit and :Man systemd.service as preperation on making a systemd unit file
+BOOKMARK: You were getting the following `pipelines.conf` file to work:
+```
+scih-dev ssh://git@git.gtz.dk:222/agj/scih.git scih-onpush /etc/sci/scripts/git-clone-and-run-sci-sh.sh
+scih-release ssh://git@git.gtz.dk:222/agj/scih.git scih-onrelease /etc/sci/scripts/git-clone-and-run-sci-sh.sh
+```
+To get this to work, you need to change some things regarding the packaging - i.e. the `scripts` directory should be
+installed as well. Also, you want `sci` to be containerizable.
+For the `.sci.sh` script to `docker login`, it will need secrets. Implement those.
+
+You were reading :Man system.unit and :Man systemd.service as preperation on making a systemd unit file
 This will be needed for the .deb package, as well as the arch linux package.
 alpine linux is using OpenRC (cool), which complicates things a little bit, but shouldn't be too bad. The wiki is
 generally really well written. Otherwise, I am sure that both wiki.gentoo and wiki.archlinux have great pages too
@@ -44,6 +53,9 @@ docker is super easy, just make a dockerfile - only concern is the trigger files
  - [ ] Custom environment variables passed to the pipelines on invokation should be possible.
  - [ ] Listener threads should be killed and restarted (worker pool should just chug along) when pipeline config file
        has changed during runtime. Should be disableable with `--no-hot-reload-config` - i.e. on by default.
+ - [ ] `docker stop` is very slow. I am probably not handling signals properly yet.
+ - [x] It seems that `-v 4` is segfaulting when running release builds, maybe the logger just cant find the source file?
+       Nope. I just wrote some bad code (inverted NULL check).
 
 ### Note Regarding `inotify` usage
 From the manpage:

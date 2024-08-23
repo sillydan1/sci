@@ -1,9 +1,7 @@
 FROM debian:latest
-# TODO: Remove busybox from this list once you're done experimenting (you only need vi)
 RUN apt-get update && apt-get install -y \
         build-essential \
         devscripts \
-        busybox \
         dh-make \
         uuid-dev \
         uuid \

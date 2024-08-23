@@ -57,7 +57,7 @@ dist:
 	mkdir -p $(NAME)-$(VERSION)
 	cp -R \
 		TODO.md README.md\
-		Makefile src include\
+		Makefile src include scripts\
 		$(NAME)-$(VERSION)
 	tar -cf - $(NAME)-$(VERSION) | gzip > $(NAME)-$(VERSION).tar.gz
 	rm -rf $(NAME)-$(VERSION)
@@ -67,10 +67,13 @@ dist:
 #		use: # make install PREFIX=/custom/path
 install: out/bin/sci
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
+	mkdir -p $(DESTDIR)$(PREFIX)/etc/sci
 	# install binaries
 	cp -f out/bin/sci $(DESTDIR)$(PREFIX)/bin
 	chmod 755 $(DESTDIR)$(PREFIX)/bin/sci
 	# install libraries
+	# install extras
+	cp -r scripts $(DESTDIR)$(PREFIX)/etc/sci/
 	# install services (only if system is using systemd though)
 	# install manpages
 	mkdir -p $(DESTDIR)$(MANPREFIX)/man1

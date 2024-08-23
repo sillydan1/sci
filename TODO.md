@@ -23,7 +23,23 @@
  - [ ] Twelveth things last, release!
    - Setup gitea.gtz.dk (will learn you how to set up subdomains (useful for shop.gtz.dk))
 
-BOOKMARK: You were getting the following `pipelines.conf` file to work:
+BOOKMARK: okay. Now it feels like it's getting complicated. I want to run `sci` in a docker container. But that means
+that the build-threads also run in that docker container - meaning the container should have all the build dependencies
+installed and we all know where that rabbithole goes. 9-30YB docker images with about a trillion unique build systems.
+Let's not do that.
+The only alternative I can see is that the `sci` service is just not dockerized. The pipeline scripts can easily be
+dockerized themselves. Just have a `scripts/wget-src-dist-and-sci-sh-dockerized.sh` with `arg1` being the docker image
+to use?
+```sh
+#!/bin/sh
+wget "$SCI_PIPELINE_URL"
+docker run --rm -it --mount type=bind,source="$(pwd)"/thefileyouwgot.tar.gz,target=/thefileyouwgot.tar.gz,readonly --entrypoint sh $2
+```
+Or something like that... Perhaps we can figure something out with an inline `ADD`, that also extracts the archive in
+the container or something. This approach is cleaner IMO. You can also more easily edit the `pipelines.conf` file if you
+need to.
+
+You were getting the following `pipelines.conf` file to work:
 ```
 scih-dev ssh://git@git.gtz.dk:222/agj/scih.git scih-onpush /etc/sci/scripts/git-clone-and-run-sci-sh.sh
 scih-release ssh://git@git.gtz.dk:222/agj/scih.git scih-onrelease /etc/sci/scripts/git-clone-and-run-sci-sh.sh

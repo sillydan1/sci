@@ -2,6 +2,7 @@
 set -e
 echo ">>> checking if required environment is set..."
 test -n "$DOCKER_TOKEN"
+which make
 
 echo ">>> compiling..."
 make
@@ -12,7 +13,7 @@ make dist
 SRC_SHA256=$(sha256sum "sci-${VERSION}.tar.gz" | awk '{ print $1 }')
 sed "s/SRC_SHA256/${SRC_SHA256}/g" < PKGBUILD.in > PKGBUILD
 
-# arch
+# # arch
 echo ">>> building archbuilder image..."
 docker build -t archbuilder -f arch-builder.dockerfile .
 
@@ -29,7 +30,7 @@ echo ">>> building debbuilder image..."
 docker build -t debbuilder -f deb-builder.dockerfile .
 
 echo ">>> building .deb in debbuilder docker image..."
-docker run --rm -it -v .:/src -e VERSION debbuilder sh -c '\
+docker run --rm -it -v .:/src -e VERSION -e DOCKER_TOKEN debbuilder sh -c '\
     cd && \
     mkdir -p artifacts && \
     cp /src/sci-$VERSION.tar.gz . && \
@@ -46,14 +47,8 @@ docker run --rm -it -v .:/src -e VERSION debbuilder sh -c '\
     cp ../*.tar.xz ~/artifacts && \
     cp ../*.tar.gz ~/artifacts && \
     cd && \
-    tar czf /src/artifacts.tar.gz artifacts
+    curl --user agj:$DOCKER_TOKEN \
+         --upload-file sci_$VERSION-1_amd64.deb \
+         "https://git.gtz.dk/api/packages/agj/debian/pool/bionic/main/upload"
 '
-
-echo ">>> building sci docker image..."
-export OWNER="git.gtz.dk/agj"
-docker build -t ${OWNER}/sci:${VERSION} -t ${OWNER}/sci:latest -f .dockerfile .
-
-echo ">>> pushing latest docker image..."
-# TODO: user should be some sci-bot or something, not your account. This will do for now though
-docker login git.gtz.dk -u agj -p "$DOCKER_TOKEN"
-docker push ${OWNER}/sci:latest
+# TODO: push-user should be some sci-bot or something, not your account. This will do for now though

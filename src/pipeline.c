@@ -40,7 +40,11 @@ optional_pipeline_conf pipeline_create(const char* config_line) {
             break;
         off = pmatch[0].rm_so + (cursor - config_line);
         len = pmatch[0].rm_eo - pmatch[0].rm_so;
-        opts[i] = strndup(config_line + off, len);
+        // Cut off the "-s if it is string-enclosed
+        if(config_line[off] == '"' && config_line[off+len-1] == '"')
+            opts[i] = strndup(config_line + off+1, len-2);
+        else
+            opts[i] = strndup(config_line + off, len);
         cursor += pmatch[0].rm_eo;
     }
     if(i != 4) {

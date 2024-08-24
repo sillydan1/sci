@@ -37,6 +37,8 @@ OBJ += out/obj/util.o
 OBJ += out/obj/pipeline.o
 OBJ += out/obj/threadlist.o
 OBJ += out/obj/threadpool.o
+OBJ += out/obj/argv_split.o
+OBJ += out/obj/which.o
 out/bin/sci: $(OBJ) | $(BINDIR)
 	$(CC) -o $@ $^ $(CFLAGS)
 

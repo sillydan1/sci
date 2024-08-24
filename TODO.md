@@ -17,15 +17,17 @@
     - [-] ~~alpine~~ later.
     - [-] ~~docker~~ later.
  - [ ] Eight things eight, try it out! - maybe even write the python webhook extension.
+  - [ ] Port this document to gitea issue tracking
  - [ ] Ninth things ninth, fix bugs, see below
  - [ ] Tenth things tenth, write manpages, choose license
  - [ ] Eleventh things Eleventh, polish
  - [ ] Twelveth things last, release!
-   - Setup gitea.gtz.dk (will learn you how to set up subdomains (useful for shop.gtz.dk))
+   - [x] Setup git.gtz.dk (will learn you how to set up subdomains (useful for shop.gtz.dk))
+ - [ ] -1th things -1th, write a blog post about the tool (also set up your blog.gtz.dk)
 
-BOOKMARK: okay. Now it feels like it's getting complicated. I want to run `sci` in a docker container. But that means
+Okay. Now it feels like it's getting complicated. I want to run `sci` in a docker container. But that means
 that the build-threads also run in that docker container - meaning the container should have all the build dependencies
-installed and we all know where that rabbithole goes. 9-30YB docker images with about a trillion unique build systems.
+installed and we all know where that rabbithole goes. 9-30YiB docker images with about a trillion unique build systems.
 Let's not do that.
 The only alternative I can see is that the `sci` service is just not dockerized. The pipeline scripts can easily be
 dockerized themselves. Just have a `scripts/wget-src-dist-and-sci-sh-dockerized.sh` with `arg1` being the docker image
@@ -33,11 +35,23 @@ to use?
 ```sh
 #!/bin/sh
 wget "$SCI_PIPELINE_URL"
-docker run --rm -it --mount type=bind,source="$(pwd)"/thefileyouwgot.tar.gz,target=/thefileyouwgot.tar.gz,readonly --entrypoint sh $2
+docker run --rm -it -v .:/src -w /src $@
 ```
 Or something like that... Perhaps we can figure something out with an inline `ADD`, that also extracts the archive in
 the container or something. This approach is cleaner IMO. You can also more easily edit the `pipelines.conf` file if you
 need to.
+
+The aforementioned rabbithole went like this:
+ - Let's say that `sci` is run inside a docker container.
+   This would make it very easy to deploy, but:
+ - Since pipelines are executed in the same environment as `sci`, either:
+   The `sci` container must be all-encompassing. i.e. it contains every single build system and scriptling language that
+   could possibly be used by any kind of user or; all pipelines must be run from a docker container themselves, meaning
+   that the `sci` container must have `dind`-privileges. Either option is suboptimal and will lock users into one way of
+   using `sci`, which is bad.
+ - Conclusion: Fuck docker. All environment management is delegated to the user and is not `sci`'s responsibility!
+   `sci` will always be run on the ci-machine itself, unless a user has provided a custom docker image, which is fine
+   and doesn't burden the `sci` project.
 
 You were getting the following `pipelines.conf` file to work:
 ```
@@ -69,7 +83,7 @@ docker is super easy, just make a dockerfile - only concern is the trigger files
  - [ ] Custom environment variables passed to the pipelines on invokation should be possible.
  - [ ] Listener threads should be killed and restarted (worker pool should just chug along) when pipeline config file
        has changed during runtime. Should be disableable with `--no-hot-reload-config` - i.e. on by default.
- - [ ] `docker stop` is very slow. I am probably not handling signals properly yet.
+ - [x] ~~`docker stop` is very slow. I am probably not handling signals properly yet.~~ native docker is abandonned
  - [x] It seems that `-v 4` is segfaulting when running release builds, maybe the logger just cant find the source file?
        Nope. I just wrote some bad code (inverted NULL check).
 

@@ -15,16 +15,20 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include "argv_split.h"
 #include "cli.h"
 #include "log.h"
 #include "notify.h"
 #include "pipeline.h"
 #include "threadpool.h"
 #include "util.h"
+#include "which.h"
 #include <fcntl.h>
+#include <linux/limits.h>
 #include <spawn.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <unistd.h>
 #include <uuid/uuid.h>
 #include <wait.h>
 
@@ -62,8 +66,10 @@ void executor(void* data) {
 
     // Create logfile path
     optional_int fd = open_logfile(pipeline_id);
-    if(!fd.has_value)
+    if(!fd.has_value) {
+        log_error("could not open log file - not starting pipeline");
         return;
+    }
 
     // spawn the process
     pid_t pid;
@@ -72,24 +78,35 @@ void executor(void* data) {
     posix_spawn_file_actions_adddup2(&actions, fd.value, STDOUT_FILENO);
     posix_spawn_file_actions_adddup2(&actions, fd.value, STDERR_FILENO);
     const pipeline_event* const e = data;
+    char* path = join("PATH=", getenv("PATH"));
     char* name = join("SCI_PIPELINE_NAME=", e->name);
     char* url = join("SCI_PIPELINE_URL=", e->url);
     char* trigger = join("SCI_PIPELINE_TRIGGER=", e->trigger);
     char* id = join("SCI_PIPELINE_ID=", pipeline_id);
-    char* envp[] = { name, url, trigger, id, NULL };
-    char* argv[] = { "/bin/sh", "-c", e->command, NULL };
-    if(posix_spawn(&pid, "/bin/sh", &actions, NULL, argv, envp) != 0) {
+    char* envp[] = { path, name, url, trigger, id, NULL };
+    int argc;
+    char** argv = create_argv_shell(e->command, &argc);
+    log_trace("executing pipeline %s with argv:", e->name);
+    for(int i = 0; i < argc; i++)
+        log_trace("  \"%s\"", argv[i]);
+    char arg0[PATH_MAX];
+    if(which(argv[0], arg0, PATH_MAX) == -1)
+        goto end;
+    if(posix_spawn(&pid, arg0, &actions, NULL, argv, envp) != 0) {
         perror("posix_spawn");
-        goto end; // I know. The raptors have picked up the scent. I'll just have to mask it with more poopy code.
+        goto end; // I know. The raptors have picked up the scent. I'll just have to mask it with more stinky code.
     }
-    log_trace("{%s} (%s) spawned", pipeline_id, e->name);
+    log_info("{%s} (%s) spawned", pipeline_id, e->name);
 
     // Wait for process to complete
     int status;
     waitpid(pid, &status, 0);
-    if(WIFEXITED(status))
-        log_trace("{%s} (%s) exited with status %d", pipeline_id, e->name, WEXITSTATUS(status));
+    log_info("{%s} (%s) exited with status %d", pipeline_id, e->name, status);
+    char buf[32];
+    sprintf(buf, "exited with status %d", status);
+    write(fd.value, buf, strnlen(buf, 32));
 end:
+    argv_free(argv);
     close(fd.value);
     free(pipeline_id);
     free(name);

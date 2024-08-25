@@ -15,14 +15,12 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include "argv_split.h"
 #include "cli.h"
 #include "log.h"
 #include "notify.h"
 #include "pipeline.h"
 #include "threadpool.h"
 #include "util.h"
-#include "which.h"
 #include <fcntl.h>
 #include <linux/limits.h>
 #include <spawn.h>
@@ -85,7 +83,7 @@ void executor(void* data) {
     char* id = join("SCI_PIPELINE_ID=", pipeline_id);
     char* envp[] = { path, name, url, trigger, id, NULL };
     int argc;
-    char** argv = create_argv_shell(e->command, &argc);
+    char** argv = argv_split(e->command, &argc);
     log_trace("executing pipeline %s with argv:", e->name);
     for(int i = 0; i < argc; i++)
         log_trace("  \"%s\"", argv[i]);

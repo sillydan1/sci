@@ -41,4 +41,11 @@ void per_line(const char* file, line_handler handler);
 
 char* join(const char* a, const char* b);
 
+const char* skip_arg(const char* cp);
+char* skip_spaces(const char* str);
+int count_argc(const char* str);
+char** argv_split(const char* str, int* argc_out);
+void argv_free(char** argv);
+int which(const char* program_name, char* out_full_program, int max_path);
+
 #endif

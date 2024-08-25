@@ -29,14 +29,15 @@ all: out/bin/sci
 out/obj/%.o: src/%.c | $(OBJDIR)
 	$(CC) -c $? $(CFLAGS) -o $@
 
-OBJ += out/obj/main.o
 OBJ += out/obj/cli.o
 OBJ += out/obj/log.o
+OBJ += out/obj/main.o
 OBJ += out/obj/notify.o
-OBJ += out/obj/util.o
 OBJ += out/obj/pipeline.o
+OBJ += out/obj/strlist.o
 OBJ += out/obj/threadlist.o
 OBJ += out/obj/threadpool.o
+OBJ += out/obj/util.o
 out/bin/sci: $(OBJ) | $(BINDIR)
 	$(CC) -o $@ $^ $(CFLAGS)
 

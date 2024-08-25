@@ -22,45 +22,45 @@
 #include <stdlib.h>
 
 char* trim(const char* const str) {
-    char* begin = strdup(str);
-    char* end;
-    while(isspace((unsigned char)*begin))
-        begin++;
-    if(*begin == 0)
-        return begin;
-    end = begin + strlen(begin) - 1;
-    while(end > begin && isspace((unsigned char)*end))
-        end--;
-    *(end + 1) = '\0';
-    return begin;
+	char* begin = strdup(str);
+	char* end;
+	while(isspace((unsigned char)*begin))
+		begin++;
+	if(*begin == 0)
+		return begin;
+	end = begin + strlen(begin) - 1;
+	while(end > begin && isspace((unsigned char)*end))
+		end--;
+	*(end + 1) = '\0';
+	return begin;
 }
 
 void per_line(const char* file, line_handler handler) {
-    FILE* stream;
-    char* line = NULL;
-    size_t len = 0;
-    ssize_t nread;
-    log_trace("reading file %s", file);
-    stream = fopen(file, "r");
-    if(stream == NULL) {
-        perror("fopen");
-        return;
-    }
-    while((nread = getline(&line, &len, stream)) != -1) {
-        char* line_trimmed = trim(line);
-        handler(line_trimmed);
-        free(line_trimmed);
-    }
-    free(line);
-    fclose(stream);
+	FILE* stream;
+	char* line = NULL;
+	size_t len = 0;
+	ssize_t nread;
+	log_trace("reading file %s", file);
+	stream = fopen(file, "r");
+	if(stream == NULL) {
+		perror("fopen");
+		return;
+	}
+	while((nread = getline(&line, &len, stream)) != -1) {
+		char* line_trimmed = trim(line);
+		handler(line_trimmed);
+		free(line_trimmed);
+	}
+	free(line);
+	fclose(stream);
 }
 
 char* join(const char* a, const char* b) {
-    size_t alen = strlen(a);
-    size_t blen = strlen(b);
-    char* result = malloc(alen + blen + 1);
-    sprintf(result, "%s%s", a, b);
-    return result;
+	size_t alen = strlen(a);
+	size_t blen = strlen(b);
+	char* result = malloc(alen + blen + 1);
+	sprintf(result, "%s%s", a, b);
+	return result;
 }
 
 const char* skip_arg(const char* cp) {
@@ -122,31 +122,31 @@ char** argv_split(const char* str, int* argc_out) {
 }
 
 int which(const char* program_name, char* out_full_program, int max_path) {
-    assert(out_full_program);
-    assert(max_path > 0);
-    // sanity check - maybe program_name is actually a full-path to begin with
-    if(access(program_name, X_OK) == 0) {
-        snprintf(out_full_program, max_path, "%s", program_name);
-        return 0;
-    }
-    char* path = getenv("PATH");
-    if (path == NULL) {
-        log_error("PATH environment variable not found.");
-        return -1;
-    }
-    char* path_cpy = strdup(path);
-    char* dir = strtok(path_cpy, ":");
-    char full_path[PATH_MAX];
-    while(dir != NULL) {
-        snprintf(full_path, sizeof(full_path), "%s/%s", dir, program_name);
-        if(access(full_path, X_OK) == 0) {
-            snprintf(out_full_program, max_path, "%s", full_path);
-            free(path_cpy);
-            return 0;
-        }
-        dir = strtok(NULL, ":");
-    }
-    log_error("'%s' not found in PATH", program_name);
-    free(path_cpy);
-    return -1;
+	assert(out_full_program);
+	assert(max_path > 0);
+	// sanity check - maybe program_name is actually a full-path to begin with
+	if(access(program_name, X_OK) == 0) {
+		snprintf(out_full_program, max_path, "%s", program_name);
+		return 0;
+	}
+	char* path = getenv("PATH");
+	if (path == NULL) {
+		log_error("PATH environment variable not found.");
+		return -1;
+	}
+	char* path_cpy = strdup(path);
+	char* dir = strtok(path_cpy, ":");
+	char full_path[PATH_MAX];
+	while(dir != NULL) {
+		snprintf(full_path, sizeof(full_path), "%s/%s", dir, program_name);
+		if(access(full_path, X_OK) == 0) {
+			snprintf(out_full_program, max_path, "%s", full_path);
+			free(path_cpy);
+			return 0;
+		}
+		dir = strtok(NULL, ":");
+	}
+	log_error("'%s' not found in PATH", program_name);
+	free(path_cpy);
+	return -1;
 }

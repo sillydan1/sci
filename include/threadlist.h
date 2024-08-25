@@ -42,9 +42,8 @@ void remove_thread_node(pthread_list_node* node);
 // Completely clear the thread list.
 // This will call pthread_join on all nodes.
 // The list is completely invalid after this call and should be discarded.
-// Note:
-//  - `root` has already been free'd.
-//  - this function is not thread-safe.
+// Even root itself will be free'd by this function so it should be discarded as well.
+// This function is not thread-safe.
 void clear_thread_list(pthread_list_node* root);
 
 #endif

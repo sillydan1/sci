@@ -15,11 +15,12 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include "cli.h"
+#include "log.h"
+#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <getopt.h>
-#include "cli.h"
 
 cli_options new_options() {
     cli_options result;
@@ -50,6 +51,19 @@ cli_options new_options() {
     char* pipeline_log_dir = getenv("SCI_PIPELINE_LOG_DIR");
     result.pipeline_log_dir.has_value = pipeline_log_dir != NULL;
     result.pipeline_log_dir.value = pipeline_log_dir;
+
+    char* environment_vars = getenv("SCI_PIPELINE_ENV_VARS");
+    if(environment_vars == NULL) {
+        result.environment_vars.has_value = false;
+        result.environment_vars.value = NULL;
+    } else {
+        char* tok = strtok(environment_vars, ";");
+        result.environment_vars.has_value = true;
+        result.environment_vars.value = create_strlist_node(tok);
+		tok = strtok(NULL, ";");
+        while(tok != NULL)
+            add_str(tok, result.environment_vars.value);
+    }
     return result;
 }
 
@@ -60,24 +74,27 @@ void destroy_options(cli_options v) {
         free(v.log_file.value);
     if(v.pipeline_log_dir.has_value)
         free(v.pipeline_log_dir.value);
+    if(v.environment_vars.has_value)
+        clear_strlist(v.environment_vars.value);
 }
 
 //                                                         <max
-const char* optstring = "f:L:e:v:Cl:hV";
+const char* optstring = "f:L:w:v:Cl:e:hV";
 const char* help_msg = 
     "%s %s\n"
-    "Usage: [-f file] [-L dir] [-e count] [-v level] \n"
-    "       [-C] [-l file] [-h] [-V]\n"
+    "Usage: [-f file] [-L dir] [-w count] [-v level] \n"
+    "       [-C] [-l file] [-e ENV] [-h] [-V]\n"
     "\n"
     SCI_DESCRIPTION "\n"
     "\n"
     "OPTIONS:\n"
     "  -f file     Set sci config file\n"
     "  -L dir      Set pipeline log output directory\n"
-    "  -e count    Set the amount of worker threads\n"
+    "  -w count    Set the amount of worker threads\n"
     "  -v level    Set verbosity level [0-4]\n"
     "  -C          Force color output, ignoring $NO_COLOR\n"
     "  -l file     Set sci's log to output to a file\n"
+    "  -e ENV      Pass an env variable to pipelines\n"
     "  -h          Show this message and exit\n"
     "  -V          Show version and exit\n"
     "\n"
@@ -106,7 +123,7 @@ cli_options parse(int argc, char** argv) {
             case 'v':
                 options.verbosity = atoi(optarg);
                 break;
-            case 'e':
+            case 'w':
                 options.executors = atoi(optarg);
                 break;
             case 'C':
@@ -121,6 +138,13 @@ cli_options parse(int argc, char** argv) {
                 break;
             case 'h':
                 options.help = true;
+                break;
+            case 'e':
+                if(!options.environment_vars.has_value) {
+                    options.environment_vars.has_value = true;
+                    options.environment_vars.value = create_strlist_node(optarg);
+                } else
+                    add_str(optarg, options.environment_vars.value);
                 break;
             default:
                 print_help(stderr, argv[0]);

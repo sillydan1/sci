@@ -30,6 +30,7 @@ out/obj/%.o: src/%.c | $(OBJDIR)
 	$(CC) -c $? $(CFLAGS) -o $@
 
 OBJ += out/obj/cli.o
+OBJ += out/obj/executor.o
 OBJ += out/obj/log.o
 OBJ += out/obj/main.o
 OBJ += out/obj/notify.o

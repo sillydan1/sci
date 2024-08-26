@@ -16,7 +16,6 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "cli.h"
-#include "log.h"
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>

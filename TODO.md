@@ -19,7 +19,7 @@
  - [ ] Eight things eight, try it out! - maybe even write the python webhook extension.
   - [ ] Port this document to gitea issue tracking
   - [x] enable PATH-able programs and argv in the command section
-  - [ ] custom environment variable passing. Something like `-e MY_TOKEN` ala docker-style
+  - [x] custom environment variable passing. Something like `-e MY_TOKEN` ala docker-style
   - [x] address sanitizers please.
  - [ ] Ninth things ninth, fix bugs, see below
  - [ ] Tenth things tenth, write manpages, choose license

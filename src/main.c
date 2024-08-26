@@ -110,6 +110,9 @@ int main(int argc, char** argv) {
         fprintf(stderr, "no such file or directory %s\n", args.config_file.value);
         exit(EXIT_FAILURE);
     }
+
+    if(args.environment_vars.has_value)
+        set_shared_environment(args.environment_vars.value);
     
     pool = threadpool_create(args.executors);
     per_line(args.config_file.value, &config_interpret_line);

@@ -76,7 +76,8 @@ char** strlist_to_array(strlist_node* root) {
     if(len <= 0)
         return NULL;
     char** result = malloc(sizeof(char*) * (len + 1));
-    memset(result, len+1, (size_t)NULL);
+    for(int i = 0; i < len+1; i++)
+        result[i] = NULL;
     strlist_node* cursor = root;
     for(int i = 0; i < len; i++) {
         if(cursor == NULL)

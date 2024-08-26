@@ -2,6 +2,7 @@
 #include "log.h"
 #include "optional.h"
 #include "pipeline.h"
+#include "strlist.h"
 #include "util.h"
 #include <fcntl.h>
 #include <linux/limits.h>
@@ -13,6 +14,11 @@
 #include <uuid/uuid.h>
 
 const char* log_dir = "./"; // NOTE: must end with a /
+const strlist_node* shared_environment = NULL;
+
+void set_shared_environment(const strlist_node* root) {
+    shared_environment = root;
+}
 
 void set_logdir(const char* logdir) {
     log_dir = logdir;
@@ -49,6 +55,38 @@ optional_int open_logfile(const char* const pipeline_id) {
     return result;
 }
 
+void add_joined_str(strlist_node* root, const char* a, const char* b) {
+    char* tmp = join(a, b);
+    add_str(tmp, root);
+    free(tmp);
+}
+
+void add_env(strlist_node* root, const char* env) {
+    char* tmp = join3(env, "=", getenv(env));
+    add_str(tmp, root);
+    free(tmp);
+}
+
+char** create_environment(const pipeline_event* const e, const char* pipeline_id) {
+    char* tmp = join("PATH=", getenv("PATH")); // TODO: consider removing PATH default, since it can be done as -e PATH
+    strlist_node* env = create_strlist_node(tmp);
+    free(tmp);
+    add_joined_str(env, "SCI_PIPELINE_NAME=", e->name);
+    add_joined_str(env, "SCI_PIPELINE_URL=", e->url);
+    add_joined_str(env, "SCI_PIPELINE_TRIGGER=", e->trigger);
+    add_joined_str(env, "SCI_PIPELINE_ID=", pipeline_id);
+    if(shared_environment != NULL) {
+        const strlist_node* cursor = shared_environment;
+        while(cursor != NULL) {
+            add_env(env, cursor->str);
+            cursor = cursor->next;
+        }
+    }
+    char** envp = strlist_to_array(env);
+    clear_strlist(env);
+    return envp;
+}
+
 void executor(void* data) {
     // Create pipeline id
     char* pipeline_id = create_pipeline_id();
@@ -67,12 +105,7 @@ void executor(void* data) {
     posix_spawn_file_actions_adddup2(&actions, fd.value, STDOUT_FILENO);
     posix_spawn_file_actions_adddup2(&actions, fd.value, STDERR_FILENO);
     const pipeline_event* const e = data;
-    char* path = join("PATH=", getenv("PATH"));
-    char* name = join("SCI_PIPELINE_NAME=", e->name);
-    char* url = join("SCI_PIPELINE_URL=", e->url);
-    char* trigger = join("SCI_PIPELINE_TRIGGER=", e->trigger);
-    char* id = join("SCI_PIPELINE_ID=", pipeline_id);
-    char* envp[] = { path, name, url, trigger, id, NULL };
+    char** envp = create_environment(e, pipeline_id);
     int argc;
     char** argv = argv_split(e->command, &argc);
     log_trace("executing pipeline %s with argv:", e->name);
@@ -98,9 +131,11 @@ end:
     argv_free(argv);
     close(fd.value);
     free(pipeline_id);
-    free(name);
-    free(url);
-    free(trigger);
-    free(id);
     free(data);
+    char** cursor = envp;
+    while(*cursor != NULL) {
+        free(*cursor);
+        cursor++;
+    }
+    free(envp);
 }

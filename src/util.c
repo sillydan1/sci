@@ -72,6 +72,16 @@ char* join3(const char* a, const char* b, const char* c) {
 	return result;
 }
 
+char* join4(const char* a, const char* b, const char* c, const char* d) {
+	size_t alen = strlen(a);
+	size_t blen = strlen(b);
+	size_t clen = strlen(c);
+	size_t dlen = strlen(d);
+	char* result = malloc(alen + blen + clen + dlen + 1);
+	sprintf(result, "%s%s%s%s", a, b, c, d);
+	return result;
+}
+
 const char* skip_arg(const char* cp) {
 	while(*cp && !isspace(*cp))
 		cp++;

@@ -8,12 +8,13 @@
 #include <linux/limits.h>
 #include <spawn.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #include <uuid/uuid.h>
 
-const char* log_dir = "./"; // NOTE: must end with a /
+const char* log_dir = ".";
 const strlist_node* shared_environment = NULL;
 
 void set_shared_environment(const strlist_node* root) {
@@ -42,15 +43,13 @@ optional_int open_logfile(const char* const pipeline_id) {
     optional_int result;
     result.has_value = false;
     result.value = 0;
-    char* log_file = join(pipeline_id, ".log");
-    char* log_filepath = join(log_dir, log_file);
+    char* log_filepath = join4(log_dir, "/", pipeline_id, ".log");
     int fd = open(log_filepath, O_WRONLY | O_CREAT | O_TRUNC, 0644);
     if (fd != -1) {
         result.has_value = true;
         result.value = fd;
     } else
         perror("open");
-    free(log_file);
     free(log_filepath);
     return result;
 }
@@ -126,7 +125,8 @@ void executor(void* data) {
     log_info("{%s} (%s) exited with status %d", pipeline_id, e->name, status);
     char buf[32];
     sprintf(buf, "exited with status %d", status);
-    write(fd.value, buf, strnlen(buf, 32));
+    if(write(fd.value, buf, strnlen(buf, 32)) == -1)
+        perror("write");
 end:
     argv_free(argv);
     close(fd.value);

@@ -8,7 +8,7 @@
  - [x] Fourth things fourth, implement a prototype that reads a space-separated file and populates a struct.
  - [x] Fifth things fifth, implement a prototype that spawns a new thread that executes a shell command.
  - [x] Sixth things sixth, daemonize it!
- - [ ] Seventh things seventh, package the sucker (arch, debian, alpine, docker)
+ - [x] Seventh things seventh, package the sucker (arch, debian, alpine, docker)
     - [x] archlinux
          - https://wiki.archlinux.org/title/Creating_packages
     - [x] debian
@@ -16,12 +16,12 @@
          - just use docker.
     - [-] ~~alpine~~ later.
     - [-] ~~docker~~ later.
- - [ ] Eight things eight, try it out! - maybe even write the python webhook extension.
-  - [ ] Port this document to gitea issue tracking
+ - [x] Eight things eight, try it out! - maybe even write the python webhook extension.
+  - [x] Port this document to gitea issue tracking
   - [x] enable PATH-able programs and argv in the command section
   - [x] custom environment variable passing. Something like `-e MY_TOKEN` ala docker-style
   - [x] address sanitizers please.
- - [ ] Ninth things ninth, fix bugs, see below
+ - [ ] Ninth things ninth, fix bugs, see https://git.gtz.dk/agj/sci/projects/1
  - [ ] Tenth things tenth, write manpages, choose license
  - [ ] Eleventh things Eleventh, polish
  - [ ] Twelveth things last, release!
@@ -70,25 +70,6 @@ This will be needed for the .deb package, as well as the arch linux package.
 alpine linux is using OpenRC (cool), which complicates things a little bit, but shouldn't be too bad. The wiki is
 generally really well written. Otherwise, I am sure that both wiki.gentoo and wiki.archlinux have great pages too
 docker is super easy, just make a dockerfile - only concern is the trigger files.
-
-#### Bugs / Missing Features
- - [x] command output is being inherited. It should be piped into some random log-file
- - [ ] pretty sure that `ctrl+c` / SIGINT is not graceful yet.
- - [ ] missing license (heavily considering GPLv3)
- - [ ] pipeline scripts should be executed in a unique `/tmp` dir
- - [ ] Some way for third parties to see which pipelines are currently running and their status.
-    - Could be as simple as looking in the logs directory.
-    - How to mark a run as failed / success / warn?
-    - Third parties may need to extract artifacts.
-      or maybe the scripts themselves would upload artifacts?
- - [ ] I am deliberately not using `Restart=on-failure` in the `scid.service` file because we are using `Type=exec`
-       and not `Type=notify` (yet) - which would require a `sd_notify` call of `READY=1` (see `man systemd.service`)
- - [ ] Custom environment variables passed to the pipelines on invokation should be possible.
- - [ ] Listener threads should be killed and restarted (worker pool should just chug along) when pipeline config file
-       has changed during runtime. Should be disableable with `--no-hot-reload-config` - i.e. on by default.
- - [x] ~~`docker stop` is very slow. I am probably not handling signals properly yet.~~ native docker is abandonned
- - [x] It seems that `-v 4` is segfaulting when running release builds, maybe the logger just cant find the source file?
-       Nope. I just wrote some bad code (inverted NULL check).
 
 ### Note Regarding `inotify` usage
 From the manpage:

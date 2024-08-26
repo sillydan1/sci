@@ -18,9 +18,12 @@ CFLAGS += -DSCI_NAME="\"$(NAME)\""
 CFLAGS += -DSCI_DESCRIPTION="\"$(DESCRIPTION)\""
 CFLAGS += -D_POSIX_C_SOURCE=2
 CFLAGS += -D_GNU_SOURCE
-CFLAGS += -Wall -Werror -std=c11 -g
+CFLAGS += -Wall -Werror -std=c11
 CFLAGS += -Iinclude
 CFLAGS += -lpthread -luuid
+CFLAGS += -fsanitize=address
+CFLAGS += -fsanitize=undefined
+CFLAGS += -g
 
 .PHONY: all clean dist install
 

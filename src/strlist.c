@@ -53,10 +53,38 @@ void remove_strlist_node(strlist_node* node) {
 void clear_strlist(strlist_node* root) {
     strlist_node* cursor = root;
     while(cursor != NULL) {
-        cursor = cursor->next;
-        if(cursor->str)
+        if(cursor->str != NULL)
             free(cursor->str);
-        cursor->str = NULL;
-        free(cursor->previous);
+        strlist_node* prev = cursor;
+        cursor = cursor->next;
+        free(prev);
     }
+}
+
+size_t strlist_length(strlist_node* root) {
+    size_t result = 0;
+    strlist_node* cursor = root;
+    while(cursor != NULL) {
+        result++;
+        cursor = cursor->next;
+    }
+    return result;
+}
+
+char** strlist_to_array(strlist_node* root) {
+    size_t len = strlist_length(root);
+    if(len <= 0)
+        return NULL;
+    char** result = malloc(sizeof(char*) * (len + 1));
+    memset(result, len+1, (size_t)NULL);
+    strlist_node* cursor = root;
+    for(int i = 0; i < len; i++) {
+        if(cursor == NULL)
+            break;
+        if(cursor->str == NULL)
+            continue;
+        result[i] = strdup(cursor->str);
+        cursor = cursor->next;
+    }
+    return result;
 }

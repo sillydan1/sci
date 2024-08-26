@@ -18,6 +18,7 @@
 #include "notify.h"
 #include "util.h"
 #include "log.h"
+#include <stdlib.h>
 
 #define EV_SIZE sizeof(struct inotify_event)
 #define BUF_LEN EV_SIZE * 32
@@ -39,13 +40,13 @@ void listen_for_changes(const pipeline_conf* config, notify_callback callback) {
     assert(r != -1);
     for(int i = 0; i < r; ) {
         struct inotify_event* e = (struct inotify_event*)&buffer[i];
-        pipeline_event ev;
-        ev.event = e;
-        ev.name = config->name;
-        ev.url = config->url;
-        ev.trigger = config->trigger;
-        ev.command = config->command;
-        callback(&ev);
+        pipeline_event* ev = malloc(sizeof(pipeline_event));
+        ev->event = e;
+        ev->name = config->name;
+        ev->url = config->url;
+        ev->trigger = config->trigger;
+        ev->command = config->command;
+        callback(ev);
         i += EV_SIZE + e->len;
     }
     ASSERT_SYSCALL_SUCCESS(close(fd));

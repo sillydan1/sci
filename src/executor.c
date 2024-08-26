@@ -24,7 +24,10 @@ void set_logdir(const char* logdir) {
 char* create_pipeline_id() {
     uuid_t uuid;
     uuid_generate(uuid);
-    char* pipeline_id = malloc(32);
+    // example uuid
+    // 662ddee9-ee7c-4d13-8999-a2604c6d12d6
+    // it's 36 characters (+null)
+    char* pipeline_id = malloc(sizeof(char) * 37);
     uuid_unparse_lower(uuid, pipeline_id);
     return pipeline_id;
 }
@@ -99,4 +102,5 @@ end:
     free(url);
     free(trigger);
     free(id);
+    free(data);
 }

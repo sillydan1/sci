@@ -48,4 +48,11 @@ void remove_strlist_node(strlist_node* node);
 // This function is not threadsafe.
 void clear_strlist(strlist_node* root);
 
+// Convert a strlist to an array of strings.
+// Note that this copies the strlist, you still have to free it.
+// The array itself is NULL terminated, enabling you to iterate to the end.
+// The array should be free'd, as well as each of the entries.
+// Returns NULL if the provided strlist is empty.
+char** strlist_to_array(strlist_node* root);
+
 #endif

@@ -67,10 +67,9 @@ void add_env(strlist_node* root, const char* env) {
 }
 
 char** create_environment(const pipeline_event* const e, const char* pipeline_id) {
-    char* tmp = join("PATH=", getenv("PATH")); // TODO: consider removing PATH default, since it can be done as -e PATH
+    char* tmp = join("SCI_PIPELINE_NAME=", e->name);
     strlist_node* env = create_strlist_node(tmp);
     free(tmp);
-    add_joined_str(env, "SCI_PIPELINE_NAME=", e->name);
     add_joined_str(env, "SCI_PIPELINE_URL=", e->url);
     add_joined_str(env, "SCI_PIPELINE_TRIGGER=", e->trigger);
     add_joined_str(env, "SCI_PIPELINE_ID=", pipeline_id);
@@ -113,7 +112,7 @@ void executor(void* data) {
     char arg0[PATH_MAX];
     if(which(argv[0], arg0, PATH_MAX) == -1)
         goto end;
-    if(posix_spawn(&pid, arg0, &actions, NULL, argv, envp) != 0) {
+    if(posix_spawnp(&pid, arg0, &actions, NULL, argv, envp) != 0) {
         perror("posix_spawn");
         goto end; // I know. The raptors have picked up the scent. I'll just have to mask it with more stinky code.
     }

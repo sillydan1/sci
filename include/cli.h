@@ -29,6 +29,7 @@ typedef struct {
     bool use_colors;
     optional_str log_file;
     optional_str pipeline_log_dir;
+    optional_str pipeline_cwd;
     optional_strlist environment_vars;
 } cli_options;
 

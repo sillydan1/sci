@@ -51,6 +51,10 @@ cli_options new_options() {
     result.pipeline_log_dir.has_value = pipeline_log_dir != NULL;
     result.pipeline_log_dir.value = pipeline_log_dir;
 
+    char* pipeline_cwd = getenv("SCI_PIPELINE_CWD");
+    result.pipeline_cwd.has_value = pipeline_cwd != NULL;
+    result.pipeline_cwd.value = pipeline_cwd;
+
     char* environment_vars = getenv("SCI_PIPELINE_ENV_VARS");
     if(environment_vars == NULL) {
         result.environment_vars.has_value = false;
@@ -78,17 +82,18 @@ void destroy_options(cli_options v) {
 }
 
 //                                                         <max
-const char* optstring = "f:L:w:v:Cl:e:hV";
+const char* optstring = "f:L:P:w:v:Cl:e:hV";
 const char* help_msg = 
     "%s %s\n"
-    "Usage: [-f file] [-L dir] [-w count] [-v level] \n"
-    "       [-C] [-l file] [-e ENV] [-h] [-V]\n"
+    "Usage: [-f file] [-L dir] [-P dir] [-w count]\n\n"
+    "       [-v level] [-C] [-l file] [-e ENV] [-h] [-V]\n"
     "\n"
     SCI_DESCRIPTION "\n"
     "\n"
     "OPTIONS:\n"
     "  -f file     Set sci config file\n"
     "  -L dir      Set pipeline log output directory\n"
+    "  -P dir      Set pipeline working directory prefix\n"
     "  -w count    Set the amount of worker threads\n"
     "  -v level    Set verbosity level [0-4]\n"
     "  -C          Force color output, ignoring $NO_COLOR\n"
@@ -118,6 +123,10 @@ cli_options parse(int argc, char** argv) {
             case 'L':
                 options.pipeline_log_dir.value = strdup(optarg);
                 options.pipeline_log_dir.has_value = true;
+                break;
+            case 'P':
+                options.pipeline_cwd.value = strdup(optarg);
+                options.pipeline_cwd.has_value = true;
                 break;
             case 'v':
                 options.verbosity = atoi(optarg);

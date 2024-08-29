@@ -15,6 +15,7 @@
 #include <uuid/uuid.h>
 
 const char* log_dir = ".";
+const char* cwd = "/tmp";
 const strlist_node* shared_environment = NULL;
 
 void set_shared_environment(const strlist_node* root) {
@@ -26,6 +27,13 @@ void set_logdir(const char* logdir) {
     struct stat st = {0};
     if(stat(log_dir, &st) == -1)
         mkdir(log_dir, 0700);
+}
+
+void set_working_directory(const char* _cwd) {
+    cwd = _cwd;
+    struct stat st = {0};
+    if(stat(cwd, &st) == -1)
+        mkdir(cwd, 0700);
 }
 
 char* create_pipeline_id() {
@@ -98,10 +106,6 @@ void executor(void* data) {
 
     // spawn the process
     pid_t pid;
-    posix_spawn_file_actions_t actions;
-    posix_spawn_file_actions_init(&actions);
-    posix_spawn_file_actions_adddup2(&actions, fd.value, STDOUT_FILENO);
-    posix_spawn_file_actions_adddup2(&actions, fd.value, STDERR_FILENO);
     const pipeline_event* const e = data;
     char** envp = create_environment(e, pipeline_id);
     int argc;
@@ -112,16 +116,34 @@ void executor(void* data) {
     char arg0[PATH_MAX];
     if(which(argv[0], arg0, PATH_MAX) == -1)
         goto end;
-    if(posix_spawnp(&pid, arg0, &actions, NULL, argv, envp) != 0) {
-        perror("posix_spawn");
+
+    // fork / cwd / exec idiom
+    pid = fork();
+    if(pid < 0) {
+        perror("fork");
         goto end; // I know. The raptors have picked up the scent. I'll just have to mask it with more stinky code.
     }
+
+    if(pid == 0) {
+        // child process
+        dup2(fd.value, STDOUT_FILENO);
+        dup2(fd.value, STDERR_FILENO);
+        char* pipeline_cwd = join3(cwd, "/", pipeline_id);
+        struct stat st = {0};
+        if(stat(pipeline_cwd, &st) == -1)
+            mkdir(pipeline_cwd, 0700);
+        chdir(pipeline_cwd);
+        free(pipeline_cwd);
+        execvpe(arg0, argv, envp);
+        return;
+    }
+
     log_info("{%s} (%s) spawned", pipeline_id, e->name);
 
     // Wait for process to complete
     int status;
     waitpid(pid, &status, 0);
-    log_info("{%s} (%s) exited with status %d", pipeline_id, e->name, status);
+    log_info("{%s} (%s) [pid=%d] exited with status %d", pipeline_id, e->name, pid, status);
     char buf[32];
     sprintf(buf, "exited with status %d", status);
     if(write(fd.value, buf, strnlen(buf, 32)) == -1)

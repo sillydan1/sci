@@ -101,6 +101,8 @@ int main(int argc, char** argv) {
 
     if(args.pipeline_log_dir.has_value)
         set_logdir(args.pipeline_log_dir.value);
+    if(args.pipeline_cwd.has_value)
+        set_working_directory(args.pipeline_cwd.value);
 
     struct stat st = {0};
     if(stat("/tmp/sci", &st) == -1)

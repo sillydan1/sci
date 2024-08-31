@@ -19,6 +19,7 @@
 #include "pipeline.h"
 #include "threadlist.h"
 #include "util.h"
+#include <pthread.h>
 #include <regex.h>
 #include <stdlib.h>
 
@@ -54,6 +55,7 @@ optional_pipeline_conf pipeline_create(const char* config_line) {
             free(opts[j]);
         return result;
     }
+    regfree(&reg);
 
     result.value = malloc(sizeof(pipeline_conf));
     result.value->name = opts[0];
@@ -88,4 +90,20 @@ void pipeline_register(pthread_t thread) {
 void pipeline_loop() {
     clear_thread_list(root);
     root = NULL;
+}
+
+void pipeline_cancel() {
+    pthread_list_node* cursor = root;
+    while(cursor != NULL) {
+        pthread_cancel(cursor->thread);
+        cursor = cursor->next;
+    }
+}
+
+void pipeline_event_destroy(pipeline_event* ev) {
+    free(ev->name);
+    free(ev->trigger);
+    free(ev->url);
+    free(ev->command);
+    free(ev);
 }

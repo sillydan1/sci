@@ -24,7 +24,7 @@
 #define BUF_LEN EV_SIZE * 32
 
 void listen_for_changes(const pipeline_conf* config, notify_callback callback) {
-    // TODO: callback is a bit slow sometimes. We should also poll once after calling callback
+    // TODO: callback is potentially slow. We should also poll once after calling callback
     const char* filename = config->trigger;
     if(access(filename, F_OK) != 0) {
         log_trace("file does not exist yet, creating it.");
@@ -37,17 +37,43 @@ void listen_for_changes(const pipeline_conf* config, notify_callback callback) {
     log_trace("listening for changes in file: %s", filename);
     char buffer[BUF_LEN];
     int r = read(fd, buffer, BUF_LEN);
-    assert(r != -1);
+    if(r == -1) {
+        perror("read");
+        return;
+    }
     for(int i = 0; i < r; ) {
         struct inotify_event* e = (struct inotify_event*)&buffer[i];
         pipeline_event* ev = malloc(sizeof(pipeline_event));
         ev->event = e;
-        ev->name = config->name;
-        ev->url = config->url;
-        ev->trigger = config->trigger;
-        ev->command = config->command;
+        ev->name = strdup(config->name);
+        ev->url = strdup(config->url);
+        ev->trigger = strdup(config->trigger);
+        ev->command = strdup(config->command);
         callback(ev);
         i += EV_SIZE + e->len;
+    }
+    ASSERT_SYSCALL_SUCCESS(close(fd));
+}
+
+void listen_for_config_changes(const char* config_filepath, config_change_callback callback) {
+    if(access(config_filepath, F_OK) != 0) {
+        perror("access");
+        return;
+    }
+    int fd = inotify_init();
+    ASSERT_SYSCALL_SUCCESS(fd);
+    inotify_add_watch(fd, config_filepath, IN_ATTRIB);
+    log_trace("listening for changes in file: %s", config_filepath);
+    char buffer[BUF_LEN];
+    int r = read(fd, buffer, BUF_LEN);
+    if(r == -1) {
+        perror("read");
+        return;
+    }
+    assert(r != -1);
+    for(int i = 0; i < r; ) {
+        callback();
+        i += EV_SIZE + ((struct inotify_event*)&buffer[i])->len;;
     }
     ASSERT_SYSCALL_SUCCESS(close(fd));
 }

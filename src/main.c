@@ -26,21 +26,26 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
-threadpool* pool = NULL;
+threadpool* worker_pool = NULL;
 char* trigger_dir = "/tmp/sci";
 bool config_file_changed = false;
 
 void on_event(pipeline_event* const e) {
-    if(!threadpool_add_work(pool, executor, (void*)e))
+    if(!threadpool_add_work(worker_pool, executor, (void*)e))
         log_error("could not add work to the threadpool");
+}
+
+void listener_thread_cleanup(void* data) {
+    // We're now done with the config.
+    pipeline_destroy((pipeline_conf*)data);
 }
 
 void* listen_for_changes_thread(void* data) {
     pipeline_conf* conf = (pipeline_conf*)data;
-    while(1) // TODO: Should be while(sigint_has_not_been_caught) instead
+    pthread_cleanup_push(listener_thread_cleanup, conf);
+    while(1)
         listen_for_changes(conf, &on_event);
-    // We're now done with the config.
-    pipeline_destroy(conf);
+    pthread_cleanup_pop(1);
     return NULL;
 }
 

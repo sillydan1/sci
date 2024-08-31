@@ -152,7 +152,7 @@ end:
     argv_free(argv);
     close(fd.value);
     free(pipeline_id);
-    free(data);
+    pipeline_event_destroy(data);
     char** cursor = envp;
     while(*cursor != NULL) {
         free(*cursor);

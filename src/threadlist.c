@@ -71,7 +71,8 @@ void clear_thread_list(pthread_list_node* root) {
     pthread_list_node* cursor = root;
     while(cursor != NULL) {
         pthread_join(cursor->thread, NULL);
+        pthread_list_node* prev = cursor;
         cursor = cursor->next;
-        free(cursor->previous);
+        free(prev);
     }
 }

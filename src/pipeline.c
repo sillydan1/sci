@@ -68,6 +68,14 @@ optional_pipeline_conf pipeline_create(const char* config_line) {
     return result;
 }
 
+void pipeline_destroy(pipeline_conf* conf) {
+    free(conf->name);
+    free(conf->url);
+    free(conf->trigger);
+    free(conf->command);
+    free(conf);
+}
+
 void pipeline_register(pthread_t thread) {
     if(root == NULL) {
         root = create_thread_node(thread);

@@ -27,6 +27,7 @@
 #include <sys/stat.h>
 
 threadpool* pool = NULL;
+char* trigger_dir = "/tmp/sci";
 
 void on_event(pipeline_event* const e) {
     if(!threadpool_add_work(pool, executor, (void*)e))
@@ -34,15 +35,11 @@ void on_event(pipeline_event* const e) {
 }
 
 void* listen_for_changes_thread(void* data) {
-    const pipeline_conf* conf = (const pipeline_conf*)data;
+    pipeline_conf* conf = (pipeline_conf*)data;
     while(1) // TODO: Should be while(sigint_has_not_been_caught) instead
         listen_for_changes(conf, &on_event);
     // We're now done with the config.
-    free(conf->name);
-    free(conf->url);
-    free(conf->trigger);
-    free(conf->command);
-    free(data);
+    pipeline_destroy(conf);
     return NULL;
 }
 
@@ -64,14 +61,9 @@ void config_interpret_line(const char* line) {
         log_error("unable to register pipeline");
         return;
     }
-    char* dest;
-    // NOTE: trigger names are allowed max 32 characters
-    dest = malloc(sizeof(*dest) * (9+33));
-    dest[0] = '\0';
-    strncat(dest, "/tmp/sci/", 10);
-    strncat(dest, conf.value->trigger, 33);
+    char* new_trigger_val = join3(trigger_dir, "/", conf.value->trigger);
     free(conf.value->trigger);
-    conf.value->trigger = dest;
+    conf.value->trigger = new_trigger_val;
     pthread_t t = spawn_listener(conf.value);
     pipeline_register(t);
 }
@@ -98,20 +90,20 @@ int main(int argc, char** argv) {
         fprintf(stderr, "no pipeline config file provided see -h for usage\n");
         exit(EXIT_FAILURE);
     }
-
-    if(args.pipeline_log_dir.has_value)
-        set_logdir(args.pipeline_log_dir.value);
-    if(args.pipeline_cwd.has_value)
-        set_working_directory(args.pipeline_cwd.value);
-
-    struct stat st = {0};
-    if(stat("/tmp/sci", &st) == -1)
-        mkdir("/tmp/sci", 0700);
-
     if(access(args.config_file.value, F_OK) != 0) {
         fprintf(stderr, "no such file or directory %s\n", args.config_file.value);
         exit(EXIT_FAILURE);
     }
+
+    if(args.pipeline_log_dir.has_value)
+        set_logdir(args.pipeline_log_dir.value);
+
+    if(args.pipeline_cwd.has_value)
+        set_working_directory(args.pipeline_cwd.value);
+
+    struct stat st = {0};
+    if(stat(trigger_dir, &st) == -1)
+        mkdir(trigger_dir, 0700);
 
     if(args.environment_vars.has_value)
         set_shared_environment(args.environment_vars.value);

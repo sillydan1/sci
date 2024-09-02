@@ -28,6 +28,7 @@
 
 threadpool* pool = NULL;
 char* trigger_dir = "/tmp/sci";
+bool config_file_changed = false;
 
 void on_event(pipeline_event* const e) {
     if(!threadpool_add_work(pool, executor, (void*)e))
@@ -66,6 +67,18 @@ void config_interpret_line(const char* line) {
     conf.value->trigger = new_trigger_val;
     pthread_t t = spawn_listener(conf.value);
     pipeline_register(t);
+}
+
+void on_config_file_changed() {
+    config_file_changed = true;
+    pipeline_cancel();
+    log_info("config file changed, reloading...");
+}
+
+void* listen_for_config_changes_thread(void* data) {
+    while(1)
+        listen_for_config_changes((const char*)data, &on_config_file_changed);
+    return NULL;
 }
 
 int main(int argc, char** argv) {
@@ -108,9 +121,18 @@ int main(int argc, char** argv) {
     if(args.environment_vars.has_value)
         set_shared_environment(args.environment_vars.value);
     
-    pool = threadpool_create(args.executors);
-    per_line(args.config_file.value, &config_interpret_line);
-
-    pipeline_loop();
-    threadpool_destroy(pool);
+    log_info("spawning trigger thread for config file");
+    pthread_t conf_listener;
+    ASSERT_SYSCALL_SUCCESS(pthread_create(&conf_listener, NULL, &listen_for_config_changes_thread, (void*)args.config_file.value));
+    pthread_setname_np(conf_listener, "sci-conf-listener");
+    do {
+        config_file_changed = false;
+        worker_pool = threadpool_create(args.executors);
+        per_line(args.config_file.value, &config_interpret_line);
+        log_info("listening for pipeline invocations");
+        pipeline_loop();
+    } while(config_file_changed);
+    pthread_cancel(conf_listener);
+    threadpool_destroy(worker_pool);
+    destroy_options(args);
 }

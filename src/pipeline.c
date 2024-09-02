@@ -48,7 +48,8 @@ optional_pipeline_conf pipeline_create(const char* config_line) {
         cursor += pmatch[0].rm_eo;
     }
     if(i != 4) {
-        log_error("invalid configuration!\nline is invalid: \"%s\"");
+        log_error("invalid configuration!");
+        log_error("line is invalid: \"%s\"", config_line);
         for(int j = i-1; j >= 0; j--)
             free(opts[j]);
         return result;

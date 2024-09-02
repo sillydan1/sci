@@ -21,9 +21,12 @@
 #include <sys/inotify.h>
 
 typedef void(*notify_callback)(pipeline_event* const);
+typedef void(*config_change_callback)();
 
 // Start listening for changes to the provided file.
 // Note that the `struct inotify_event*` provided is a managed pointer.
 void listen_for_changes(const pipeline_conf* config, notify_callback callback);
+
+void listen_for_config_changes(const char* config_filepath, config_change_callback callback);
 
 #endif

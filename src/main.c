@@ -22,6 +22,7 @@
 #include "pipeline.h"
 #include "threadpool.h"
 #include "util.h"
+#include <signal.h>
 #include <stdlib.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -86,6 +87,12 @@ void* listen_for_config_changes_thread(void* data) {
     return NULL;
 }
 
+void signal_handler(int signal) {
+    log_info("signal retrieved");
+    if(signal == SIGINT)
+        pipeline_cancel();
+}
+
 int main(int argc, char** argv) {
     cli_options args = parse(argc, argv);
     log_settings settings;
@@ -93,6 +100,8 @@ int main(int argc, char** argv) {
     settings.use_colors = args.use_colors;
     settings.out_file = args.log_file.has_value ? fopen(args.log_file.value, "w+") : stdout;
     log_init(settings);
+
+    signal(SIGINT, signal_handler);
 
     if(args.help) {
         print_help(stdout, argv[0]);

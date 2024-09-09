@@ -26,6 +26,7 @@
 pthread_list_node* root = NULL;
 
 optional_pipeline_conf pipeline_create(const char* config_line) {
+    log_trace("pipeline create");
     optional_pipeline_conf result;
     result.has_value = false;
     const char* pattern = "[^[:blank:]]+|\"[^\"]*\"";
@@ -72,6 +73,7 @@ optional_pipeline_conf pipeline_create(const char* config_line) {
 }
 
 void pipeline_destroy(pipeline_conf* conf) {
+    log_trace("pipeline destroy");
     free(conf->name);
     free(conf->url);
     free(conf->trigger);
@@ -80,6 +82,7 @@ void pipeline_destroy(pipeline_conf* conf) {
 }
 
 void pipeline_register(pthread_t thread) {
+    log_trace("pipeline register thread");
     if(root == NULL) {
         root = create_thread_node(thread);
         return;
@@ -88,11 +91,13 @@ void pipeline_register(pthread_t thread) {
 }
 
 void pipeline_loop() {
+    log_trace("pipeline loop");
     clear_thread_list(root);
     root = NULL;
 }
 
 void pipeline_cancel() {
+    log_trace("cancelling pipeline");
     pthread_list_node* cursor = root;
     while(cursor != NULL) {
         pthread_cancel(cursor->thread);
@@ -101,6 +106,7 @@ void pipeline_cancel() {
 }
 
 void pipeline_event_destroy(pipeline_event* ev) {
+    log_trace("pipeline event destroy");
     free(ev->name);
     free(ev->trigger);
     free(ev->url);

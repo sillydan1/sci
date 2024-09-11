@@ -20,7 +20,7 @@ CFLAGS += -D_POSIX_C_SOURCE=2
 CFLAGS += -D_GNU_SOURCE
 CFLAGS += -Wall -Werror -std=c11
 CFLAGS += -Iinclude
-CFLAGS += -lpthread -luuid
+CFLAGS += -lpthread -luuid -lrt
 CFLAGS += -fsanitize=address
 CFLAGS += -fsanitize=undefined
 CFLAGS += -g
@@ -32,6 +32,7 @@ all: out/bin/sci
 out/obj/%.o: src/%.c | $(OBJDIR)
 	$(CC) -c $? $(CFLAGS) -o $@
 
+OBJ += out/obj/api.o
 OBJ += out/obj/cli.o
 OBJ += out/obj/executor.o
 OBJ += out/obj/log.o

@@ -22,6 +22,7 @@
   - [x] custom environment variable passing. Something like `-e MY_TOKEN` ala docker-style
   - [x] address sanitizers please.
  - [ ] Ninth things ninth, fix bugs, see https://git.gtz.dk/agj/sci/projects/1
+  - [ ] docstring in all header files
  - [ ] Tenth things tenth, write manpages, choose license
  - [ ] Eleventh things Eleventh, polish
  - [ ] Twelveth things last, release!

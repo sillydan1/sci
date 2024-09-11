@@ -36,12 +36,13 @@ typedef struct {
     char* command;
 } pipeline_event;
 
-// create a new pipeline_conf struct instance based on a configuration line.
+// create a new `pipeline_conf` struct instance based on a configuration line.
 optional_pipeline_conf pipeline_create(const char* config_line);
 void pipeline_event_destroy(pipeline_event* ev);
 void pipeline_destroy(pipeline_conf* conf);
 void pipeline_register(pthread_t thread);
 void pipeline_loop();
 void pipeline_cancel();
+int pipeline_count();
 
 #endif

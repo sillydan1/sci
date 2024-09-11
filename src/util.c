@@ -82,6 +82,29 @@ char* join4(const char* a, const char* b, const char* c, const char* d) {
 	return result;
 }
 
+char* join5(const char* a, const char* b, const char* c, const char* d, const char* e) {
+	size_t alen = strlen(a);
+	size_t blen = strlen(b);
+	size_t clen = strlen(c);
+	size_t dlen = strlen(d);
+	size_t elen = strlen(e);
+	char* result = malloc(alen + blen + clen + dlen + elen + 1);
+	sprintf(result, "%s%s%s%s%s", a, b, c, d, e);
+	return result;
+}
+
+char* join6(const char* a, const char* b, const char* c, const char* d, const char* e, const char* f) {
+	size_t alen = strlen(a);
+	size_t blen = strlen(b);
+	size_t clen = strlen(c);
+	size_t dlen = strlen(d);
+	size_t elen = strlen(e);
+	size_t flen = strlen(f);
+	char* result = malloc(alen + blen + clen + dlen + elen + flen + 1);
+	sprintf(result, "%s%s%s%s%s%s", a, b, c, d, e, f);
+	return result;
+}
+
 const char* skip_arg(const char* cp) {
 	while(*cp && !isspace(*cp))
 		cp++;

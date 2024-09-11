@@ -113,3 +113,13 @@ void pipeline_event_destroy(pipeline_event* ev) {
     free(ev->command);
     free(ev);
 }
+
+int pipeline_count() {
+    int result = 0;
+    pthread_list_node* cursor = root;
+    while(cursor != NULL) {
+        cursor = cursor->next;
+        result++;
+    }
+    return result;
+}

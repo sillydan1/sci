@@ -16,6 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "executor.h"
+#include "api.h"
 #include "log.h"
 #include "optional.h"
 #include "pipeline.h"
@@ -155,11 +156,13 @@ void executor(void* data) {
         return;
     }
 
+    api_pipeline_started(pipeline_id, e->name);
     log_info("{%s} (%s) spawned", pipeline_id, e->name);
 
     // Wait for process to complete
     int status;
     waitpid(pid, &status, 0);
+    api_pipeline_ended(pipeline_id, e->name, status);
     log_info("{%s} (%s) [pid=%d] exited with status %d", pipeline_id, e->name, pid, status);
     char buf[32];
     sprintf(buf, "exited with status %d", status);

@@ -42,6 +42,8 @@ void per_line(const char* file, line_handler handler);
 char* join(const char* a, const char* b);
 char* join3(const char* a, const char* b, const char* c);
 char* join4(const char* a, const char* b, const char* c, const char* d);
+char* join5(const char* a, const char* b, const char* c, const char* d, const char* e);
+char* join6(const char* a, const char* b, const char* c, const char* d, const char* e, const char* f);
 
 const char* skip_arg(const char* cp);
 char* skip_spaces(const char* str);

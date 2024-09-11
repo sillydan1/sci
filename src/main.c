@@ -15,6 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include "api.h"
 #include "cli.h"
 #include "executor.h"
 #include "log.h"
@@ -22,10 +23,12 @@
 #include "pipeline.h"
 #include "threadpool.h"
 #include "util.h"
+#include <mqueue.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <time.h>
 
 threadpool* worker_pool = NULL;
 char* trigger_dir = "/tmp/sci";
@@ -117,6 +120,7 @@ int main(int argc, char** argv) {
         fprintf(stderr, "no pipeline config file provided see -h for usage\n");
         exit(EXIT_FAILURE);
     }
+
     if(access(args.config_file.value, F_OK) != 0) {
         fprintf(stderr, "no such file or directory %s\n", args.config_file.value);
         exit(EXIT_FAILURE);
@@ -134,6 +138,8 @@ int main(int argc, char** argv) {
 
     if(args.environment_vars.has_value)
         set_shared_environment(args.environment_vars.value);
+
+    api_start_p();
     
     log_info("spawning trigger thread for config file");
     pthread_t conf_listener;
@@ -149,4 +155,5 @@ int main(int argc, char** argv) {
     pthread_cancel(conf_listener);
     threadpool_destroy(worker_pool);
     destroy_options(args);
+    api_destroy();
 }

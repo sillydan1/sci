@@ -78,6 +78,7 @@ void log_log(const char* file, int line, int level, const char* fmt, ...) {
         g_log_tm = localtime(&t);
     }
     strftime(timestamp, sizeof(timestamp), "%H:%M:%S", g_log_tm);
+    g_log_tm = NULL;
 
     const char* level_color = get_level_color(level);
     const char* level_name = get_level_name(level);

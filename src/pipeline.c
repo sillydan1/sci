@@ -23,7 +23,7 @@
 #include <regex.h>
 #include <stdlib.h>
 
-pthread_list_node* root = NULL;
+pthread_list_node* pipeline_list_root = NULL;
 
 optional_pipeline_conf pipeline_create(const char* config_line) {
     log_trace("pipeline create");
@@ -83,22 +83,22 @@ void pipeline_destroy(pipeline_conf* conf) {
 
 void pipeline_register(pthread_t thread) {
     log_trace("pipeline register thread");
-    if(root == NULL) {
-        root = create_thread_node(thread);
+    if(pipeline_list_root == NULL) {
+        pipeline_list_root = create_thread_node(thread);
         return;
     }
-    add_thread(thread, root);
+    add_thread(thread, pipeline_list_root);
 }
 
 void pipeline_loop() {
     log_trace("pipeline loop");
-    clear_thread_list(root);
-    root = NULL;
+    clear_thread_list(pipeline_list_root);
+    pipeline_list_root = NULL;
 }
 
 void pipeline_cancel() {
     log_trace("cancelling pipeline");
-    pthread_list_node* cursor = root;
+    pthread_list_node* cursor = pipeline_list_root;
     while(cursor != NULL) {
         pthread_cancel(cursor->thread);
         cursor = cursor->next;
@@ -116,7 +116,7 @@ void pipeline_event_destroy(pipeline_event* ev) {
 
 int pipeline_count() {
     int result = 0;
-    pthread_list_node* cursor = root;
+    pthread_list_node* cursor = pipeline_list_root;
     while(cursor != NULL) {
         cursor = cursor->next;
         result++;

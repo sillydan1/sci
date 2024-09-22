@@ -1,0 +1,30 @@
+.TH sci_api 7 2024-10-12 "VERSION" "Simple CI manual"
+.SH
+NAME
+.B sci
+api
+
+.SH
+SYNOPSIS
+This document describes the api for interacting with
+.B sci
+in an interactive manner.
+
+.SH
+DISCLAIMER
+The
+.B sci
+api is very much a work in progress, and the interface may very well change - even radically - in the future.
+
+.SH
+DESCRIPTION
+The
+.B sci
+api is communicating through posix message queues
+(see
+.BR mq_overview (7)
+for more)
+and is using a custom message format.
+
+.SH "SEE ALSO"
+.BR sci (1)

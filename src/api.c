@@ -91,7 +91,7 @@ void api_pipeline_started(const char* pipeline_id, const char* name) {
 void api_pipeline_ended(const char* pipeline_id, const char* name, int exit_code) {
     char exit_code_str[64];
     sprintf(exit_code_str, " %d", exit_code);
-    char* msg = join6("pipeline_end ", pipeline_id, " ", name, " ", exit_code_str);
+    char* msg = join5("pipeline_end ", pipeline_id, " ", name, exit_code_str);
     if(mq_send(api_out, msg, strnlen(msg, 256), 1) == -1)
         perror("mq_send");
     free(msg);
